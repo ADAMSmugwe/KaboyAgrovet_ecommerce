@@ -1,0 +1,39 @@
+{# templates/admin/model/product_variants_inline.html #}
+{# This template overrides Flask-Admin's default inline form rendering for product variants. #}
+{# It forces specific fields to render as basic text inputs, bypassing Select2Widget issues. #}
+
+{% from 'admin/lib.html' import form_tag, render_field %}
+
+{% call form_tag(action=url_for('.inline_edit')) %}
+<input type="hidden" name="id" value="{{ field.form.id.data }}">
+
+<div class="form-group">
+    <label>{{ field.form.quantity_value.label }}</label>
+    {{ render_field(field.form.quantity_value, class='form-control') }}
+</div>
+
+<div class="form-group">
+    <label>{{ field.form.quantity_unit.label }}</label>
+    {# Manually render quantity_unit as a simple text input #}
+    <input class="form-control" name="{{ field.form.quantity_unit.name }}" 
+           type="text" value="{{ field.form.quantity_unit.data or '' }}">
+</div>
+
+<div class="form-group">
+    <label>{{ field.form.selling_price.label }}</label>
+    {{ render_field(field.form.selling_price, class='form-control') }}
+</div>
+
+<div class="form-group">
+    <label>{{ field.form.buying_price.label }}</label>
+    {{ render_field(field.form.buying_price, class='form-control') }}
+</div>
+
+{# Add the delete checkbox for existing items #}
+{% if field.form.id.data %}
+<div class="form-group">
+    <label>{{ field.form.DELETE.label }}</label>
+    {{ render_field(field.form.DELETE) }}
+</div>
+{% endif %}
+{% endcall %} 

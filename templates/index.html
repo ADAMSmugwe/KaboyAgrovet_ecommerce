@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaboy Agrovet - Your Trusted Agri-Partner in Nchiru</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="/static/images/Kaboy Agrovet.png" alt="Kaboy Agrovet Logo">
+                    <div class="logo-text">
+                        <h1>Kaboy Agrovet</h1>
+                        <p>Your Trusted Agri-Partner in Nchiru</p>
+                    </div>
+                </div>
+                <div class="cart-icon">
+                    🛒 <span id="cartItemCount" class="cart-count">0</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#home" class="active">Home</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#products">Products</a></li>
+                    <li><a href="#gallery">Gallery</a></li>
+                    <li><a href="#testimonials">Testimonials</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <div class="hamburger">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-bg-images">
+            <img src="/static/images/landingpage2.png" alt="Hero Background 1" class="hero-bg-img active" id="heroBgImg1">
+            <img src="/static/images/landingpage3.png" alt="Hero Background 2" class="hero-bg-img" id="heroBgImg2">
+            <img src="/static/images/landingpage4.png" alt="Hero Background 3" class="hero-bg-img" id="heroBgImg3">
+            <img src="/static/images/landingpage5.png" alt="Hero Background 4" class="hero-bg-img" id="heroBgImg4">
+            <img src="/static/images/landingpage6.png" alt="Hero Background 5" class="hero-bg-img" id="heroBgImg5">
+            <img src="/static/images/kaboy landing page 2.jpg" alt="Hero Background 6" class="hero-bg-img" id="heroBgImg6">
+            <img src="/static/images/kaboy landing page.jpg" alt="Hero background 7" class="hero-bg-img" id="heroBgImg7">
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <h1>Welcome to Kaboy Agrovet</h1>
+                <p>Your Trusted Agri-Partner in Nchiru, located next to Meru University of Science and Technology</p>
+                <div class="hero-btns">
+                    <a href="#products" class="btn">Our Products</a>
+                    <a href="#contact" class="btn btn-accent">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section about" id="about">
+        <div class="container">
+            <h2 class="section-title">About Us</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>Your Trusted Agricultural Partner</h3>
+                    <p>Kaboy Agrovet has been serving the Nchiru community and surrounding areas since 2015, providing high-quality agricultural products and expert advice to farmers and animal keepers.</p>
+                    <p>Located conveniently next to Meru University of Science and Technology, we are committed to supporting both small-scale and large-scale farmers with the best products and services in the agricultural sector.</p>
+                    
+                    <div class="about-features">
+                        <div class="feature-item">
+                            <div class="feature-icon">✓</div>
+                            <div>
+                                <h4>Our Mission</h4>
+                                <p>To provide quality agricultural products and services that enhance productivity and profitability for our customers.</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">✓</div>
+                            <div>
+                                <h4>Our Vision</h4>
+                                <p>To be the leading agrovet in the region, known for excellence in products, services, and customer care.</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">✓</div>
+                            <div>
+                                <h4>Our Values</h4>
+                                <p>Integrity, Quality, Customer Focus, and Innovation drive everything we do.</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">✓</div>
+                            <div>
+                                <h4>Our Team</h4>
+                                <p>Certified professionals with extensive experience in veterinary and agricultural services.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-img">
+                    <img src="/static/images/gallery4.png" alt="Kaboy Agrovet Store">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="section services" id="services">
+        <div class="container">
+            <h2 class="section-title">Our Services</h2>
+            <div class="services-container">
+                <div class="service-card">
+                    <div class="service-icon">🐄</div>
+                    <h3>Veterinary Services</h3>
+                    <p>Professional veterinary care for all your livestock including vaccination, deworming, and treatment of various animal diseases.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🌱</div>
+                    <h3>Agronomic Advice</h3>
+                    <p>Expert guidance on crop selection, planting, pest control, and soil management to maximize your farm's productivity.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">💊</div>
+                    <h3>Animal Health Products</h3>
+                    <p>Wide range of veterinary drugs, vaccines, and supplements to keep your animals healthy and productive.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🚜</div>
+                    <h3>Farm Equipment</h3>
+                    <p>Quality farm tools and equipment to make your work easier and more efficient.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">📦</div>
+                    <h3>Delivery Services</h3>
+                    <p>Convenient delivery of products to your farm or home within Nchiru and surrounding areas.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">📚</div>
+                    <h3>Training Programs</h3>
+                    <p>Regular workshops and training sessions on modern farming techniques and animal husbandry.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="section products" id="products">
+        <div class="container">
+            <h2 class="section-title">Our Products</h2>
+            <div class="product-filters">
+                <input type="text" id="productSearchInput" placeholder="Search products..." class="search-input">
+                <button class="filter-btn active" data-filter="all">All Products</button>
+                <button class="filter-btn" data-filter="feeds">Animal Feeds</button>
+                <button class="filter-btn" data-filter="seeds">Seeds</button>
+                <button class="filter-btn" data-filter="drugs">Veterinary Drugs</button>
+                <button class="filter-btn" data-filter="fertilizers">Fertilizers</button>
+                <button class="filter-btn" data-filter="tools">Farm Tools</button>
+            </div>
+            <div class="products-grid">
+                <!-- Product 1 -->
+                <div class="product-card" data-category="feeds">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1592921870789-04563d55041c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Poultry Feed">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-category">Animal Feeds</span>
+                        <h3 class="product-title">Premium Poultry Feed</h3>
+                        <p class="product-price">KSh 3,500 per 50kg bag</p>
+                        <p class="product-desc">High-quality poultry feed formulated for optimal growth and egg production. Contains essential nutrients and vitamins.</p>
+                        <button class="btn order-btn" type="button" data-product-name="Premium Poultry Feed" data-product-price="KSh 3,500 per 50kg bag">Order Now</button>
+                    </div>
+                </div>
+                
+                <!-- Product 2 -->
+                <div class="product-card" data-category="feeds">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1558326567-98ae2405596b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Dairy Meal">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-category">Animal Feeds</span>
+                        <h3 class="product-title">Dairy Meal</h3>
+                        <p class="product-price">KSh 3,200 per 50kg bag</p>
+                        <p class="product-desc">Specially formulated for dairy cows to increase milk production. Rich in proteins and minerals.</p>
+                        <button class="btn order-btn" type="button" data-product-name="Dairy Meal" data-product-price="KSh 3,200 per 50kg bag">Order Now</button>
+                    </div>
+                </div>
+                
+                <!-- Product 3 -->
+                <div class="product-card" data-category="seeds">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1518977676601-b53f82aba655?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Maize Seeds">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-category">Seeds</span>
+                        <h3 class="product-title">Hybrid Maize Seeds</h3>
+                        <p class="product-price">KSh 1,800 per 2kg packet</p>
+                        <p class="product-desc">High-yielding hybrid maize seeds with disease resistance. Suitable for various climatic conditions.</p>
+                        <button class="btn order-btn" type="button" data-product-name="Hybrid Maize Seeds" data-product-price="KSh 1,800 per 2kg packet">Order Now</button>
+                    </div>
+                </div>
+                
+                <!-- Product 4 -->
+                <div class="product-card" data-category="seeds">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1595231776511-0a8b1a0b0b6a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Vegetable Seeds">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-category">Seeds</span>
+                        <h3 class="product-title">Vegetable Seeds Pack</h3>
+                        <p class="product-price">KSh 350 per pack</p>
+                        <p class="product-desc">Assorted vegetable seeds including kale, spinach, tomatoes, and onions. High germination rate.</p>
+                        <button class="btn order-btn" type="button" data-product-name="Vegetable Seeds Pack" data-product-price="KSh 350 per pack">Order Now</button>
+                    </div>
+                </div>
+                
+                <!-- Product 5 -->
+                <div class="product-card" data-category="drugs">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Animal Vaccines">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-category">Veterinary Drugs</span>
+                        <h3 class="product-title">Animal Vaccines</h3>
+                        <p class="product-price">From KSh 500 per dose</p>
+                        <p class="product-desc">Various vaccines for livestock including Newcastle, FMD, and rabies vaccines. Keep your animals protected.</p>
+                        <button class="btn order-btn" type="button" data-product-name="Animal Vaccines" data-product-price="From KSh 500 per dose">Order Now</button>
+                    </div>
+                </div>
+                
+                <!-- Product 6 -->
+                <div class="product-card" data-category="drugs">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1587049352851-8d4e89133924?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Dewormers">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-category">Veterinary Drugs</span>
+                        <h3 class="product-title">Animal Dewormers</h3>
+                        <p class="product-price">From KSh 300 per dose</p>
+                        <p class="product-desc">Effective dewormers for all livestock. Available for cattle, poultry, sheep, goats, and pigs.</p>
+                        <button class="btn order-btn" type="button" data-product-name="Animal Dewormers" data-product-price="From KSh 300 per dose">Order Now</button>
+                    </div>
+                </div>
+                
+                <!-- Product 7 -->
+                <div class="product-card" data-category="fertilizers">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1586771107445-d3ca888129ce?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="NPK Fertilizer">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-category">Fertilizers</span>
+                        <h3 class="product-title">NPK Fertilizer</h3>
+                        <p class="product-price">KSh 3,800 per 50kg bag</p>
+                        <p class="product-desc">Balanced NPK fertilizer for all crops. Improves soil fertility and boosts crop yields.</p>
+                        <button class="btn order-btn" type="button" data-product-name="NPK Fertilizer" data-product-price="KSh 3,800 per 50kg bag">Order Now</button>
+                    </div>
+                </div>
+                
+                <!-- Product 8 -->
+                <div class="product-card" data-category="tools">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1585011650347-c59dbef5a823?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Sprayer">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-category">Farm Tools</span>
+                        <h3 class="product-title">Knapsack Sprayer</h3>
+                        <p class="product-price">KSh 4,500 each</p>
+                        <p class="product-desc">High-quality knapsack sprayer for pesticides and foliar feeds. Durable and easy to use.</p>
+                        <button class="btn order-btn" type="button" data-product-name="Knapsack Sprayer" data-product-price="KSh 4,500 each">Order Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="section gallery" id="gallery">
+        <div class="container">
+            <h2 class="section-title">Our Gallery</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <img src="/static/images/duduthrin.png" alt="Kaboy Agrovet Store">
+                    <div class="gallery-overlay">
+                        <span class="gallery-icon">🔍</span>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/static/images/CAN.png" alt="Farm Products">
+                    <div class="gallery-overlay">
+                        <span class="gallery-icon">🔍</span>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/static/images/gallery1.png" alt="Animal Feeds">
+                    <div class="gallery-overlay">
+                        <span class="gallery-icon">🔍</span>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/static/images/gallery2.png" alt="Poultry Section">
+                    <div class="gallery-overlay">
+                        <span class="gallery-icon">🔍</span>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/static/images/gallery3.png" alt="Seed Display">
+                    <div class="gallery-overlay">
+                        <span class="gallery-icon">🔍</span>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/static/images/gallery4.png" alt="Farm Tools">
+                    <div class="gallery-overlay">
+                        <span class="gallery-icon">🔍</span>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/static/images/landingpage2.png" alt="Veterinary Products">
+                    <div class="gallery-overlay">
+                        <span class="gallery-icon">🔍</span>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/static/images/landingpage3.png" alt="Happy Customers">
+                    <div class="gallery-overlay">
+                        <span class="gallery-icon">🔍</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lightbox -->
+    <div class="lightbox">
+        <div class="lightbox-content">
+            <span class="close-lightbox">&times;</span>
+            <img src="" alt="Gallery Image">
+        </div>
+    </div>
+
+    <!-- Testimonials Section -->
+    <section class="section testimonials" id="testimonials">
+        <div class="container">
+            <h2 class="section-title">Customer Testimonials</h2>
+            <div class="testimonial-slider">
+                <!-- Testimonial 1 -->
+                <div class="testimonial-slide active">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Customer" class="testimonial-img">
+                    <p class="testimonial-text">"Kaboy Agrovet has been my trusted partner for all my farming needs. Their poultry feeds have significantly improved my egg production, and their advice is always spot on."</p>
+                    <h4 class="testimonial-author">Jane Muthoni</h4>
+                    <p class="testimonial-position">Poultry Farmer, Nchiru</p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="testimonial-slide">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Customer" class="testimonial-img">
+                    <p class="testimonial-text">"The hybrid maize seeds I bought from Kaboy Agrovet gave me the best harvest I've ever had. Their staff are knowledgeable and always willing to help."</p>
+                    <h4 class="testimonial-author">John Kamau</h4>
+                    <p class="testimonial-position">Maize Farmer, Meru</p>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="testimonial-slide">
+                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Customer" class="testimonial-img">
+                    <p class="testimonial-text">"Their veterinary services saved my dairy cows from a serious infection. The drugs were effective and reasonably priced. I highly recommend Kaboy Agrovet."</p>
+                    <h4 class="testimonial-author">Mary Wambui</h4>
+                    <p class="testimonial-position">Dairy Farmer, Tigania</p>
+                </div>
+                
+                <div class="testimonial-nav">
+                    <div class="testimonial-dot active" data-slide="0"></div>
+                    <div class="testimonial-dot" data-slide="1"></div>
+                    <div class="testimonial-dot" data-slide="2"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="section faq" id="faq">
+        <div class="container">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <div class="faq-container">
+                <!-- FAQ Item 1 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>What are your opening hours?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We are open Monday to Saturday from 8:00 AM to 6:00 PM. We are closed on Sundays and public holidays.</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ Item 2 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Do you offer delivery services?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, we offer delivery services within Nchiru and surrounding areas for orders above KSh 2,000. Delivery charges may apply depending on the distance.</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ Item 3 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>How often should I vaccinate my poultry?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Poultry vaccination schedules vary depending on the vaccine. Generally, Newcastle disease vaccine is given at day 1, week 2, and every 2-3 months thereafter. Our veterinary staff can provide a customized vaccination schedule for your flock.</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ Item 4 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>What payment methods do you accept?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We accept cash, M-Pesa, and bank transfers. Our M-Pesa paybill number is 123456, account number being your name.</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ Item 5 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Do you offer credit facilities?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We offer credit facilities to our registered customers with good payment history. Terms and conditions apply. Please visit our store with your national ID and two references to apply.</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ Item 6 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Can I return products I'm not satisfied with?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We accept returns of unopened and unused products within 7 days of purchase with the original receipt. Perishable goods and veterinary drugs cannot be returned for health and safety reasons.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section contact" id="contact">
+        <div class="container">
+            <h2 class="section-title">Contact Us</h2>
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>Get In Touch</h3>
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <div class="contact-icon">📍</div>
+                            <div class="contact-text">
+                                <h4>Our Location</h4>
+                                <p>Nchiru Town, Next to Meru University of Science and Technology, Meru County, Kenya</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">📞</div>
+                            <div class="contact-text">
+                                <h4>Phone Number</h4>
+                                <p>+254 712 345 678</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">✉️</div>
+                            <div class="contact-text">
+                                <h4>Email Address</h4>
+                                <p>info@kaboyagrovet.co.ke</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">⏰</div>
+                            <div class="contact-text">
+                                <h4>Working Hours</h4>
+                                <p>Monday - Saturday: 8:00 AM - 6:00 PM<br>Closed on Sundays and Public Holidays</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-map">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.141505370243!2d37.64491957444158!3d0.01639019999999494!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1788220fe2a70055%3A0x633b4d4554302636!2sMeru%20University%20Of%20Science%20And%20Technology!5e0!3m2!1sen!2ske!4v1701234567890!5m2!1sen!2ske"
+                            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <h3>Send Us a Message</h3>
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" name="name" required>
+                            <small class="error-message" id="nameError"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Your Email</label>
+                            <input type="email" id="email" name="email" required>
+                            <small class="error-message" id="emailError"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Your Message</label>
+                            <textarea id="message" name="message" required></textarea>
+                            <small class="error-message" id="messageError"></small>
+                        </div>
+                        <div class="form-submit">
+                            <button type="submit" class="btn">Send Message</button>
+                        </div>
+                        <div id="formMessage" class="form-message"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-col">
+                    <h3>Kaboy Agrovet</h3>
+                    <p>Your trusted agri-partner in Nchiru, providing quality agricultural products and services since 2015.</p>
+                    <div class="footer-social">
+                        <a href="#" class="social-icon">📱</a>
+                        <a href="#" class="social-icon">💻</a>
+                        <a href="#" class="social-icon">📘</a>
+                        <a href="#" class="social-icon">📸</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#products">Products</a></li>
+                        <li><a href="#gallery">Gallery</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Our Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Veterinary Services</a></li>
+                        <li><a href="#">Agronomic Advice</a></li>
+                        <li><a href="#">Animal Health Products</a></li>
+                        <li><a href="#">Farm Equipment</a></li>
+                        <li><a href="#">Delivery Services</a></li>
+                        <li><a href="#">Training Programs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Contact Info</h3>
+                    <p>Nchiru Town, Next to MUST</p>
+                    <p>Meru County, Kenya</p>
+                    <p>Phone: +254 720 576109</p>
+                    <p>Name: Martin Muthamia</p>
+                    <p>Email: info@kaboyagrovet.co.ke</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="year"></span> Kaboy Agrovet. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="action-choice-modal-overlay" id="actionChoiceModal">
+        <div class="action-choice-modal-content">
+            <span class="close-action-choice-modal">&times;</span>
+            <h3>What would you like to do?</h3>
+            <div class="choice-buttons">
+                <button class="btn btn-primary" id="optionAddToCart">Add to Cart</button>
+                <button class="btn btn-accent" id="optionConfirmOrder">Confirm Order</button>
+            </div>
+            <div class="action-choice-message" id="actionChoiceMessage"></div>
+        </div>
+    </div>
+
+    <div class="order-modal-overlay" id="orderModal">
+        <div class="order-modal-content">
+            <span class="close-order-modal">&times;</span>
+            <h3>Place Your Order</h3>
+            <p>You are ordering: <span id="modalProductName"></span></p>
+            <form id="orderForm">
+                <div class="form-group">
+                    <label for="orderName">Your Name</label>
+                    <input type="text" id="orderName" name="name" required>
+                    <small class="error-message" id="orderNameError"></small>
+                </div>
+                <div class="form-group">
+                    <label for="orderPhone">Phone Number</label>
+                    <input type="tel" id="orderPhone" name="phone" required>
+                    <small class="error-message" id="orderPhoneError"></small>
+                </div>
+                <div class="form-group">
+                    <label for="orderQuantity">Quantity</label>
+                    <input type="number" id="orderQuantity" name="quantity" min="1" value="1" required>
+                    <small class="error-message" id="orderQuantityError"></small>
+                </div>
+                <input type="hidden" id="orderProductInput" name="product">
+                <div class="form-submit">
+                    <button type="submit" class="btn">Confirm Order</button>
+                </div>
+                <div id="orderFormMessage" class="form-message"></div>
+            </form>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

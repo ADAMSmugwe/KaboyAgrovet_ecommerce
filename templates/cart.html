@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Shopping Cart - Kaboy Agrovet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Basic Cart Page Styles - will integrate with style.css later */
+        .cart-page-container {
+            max-width: 900px;
+            margin: 120px auto 50px auto; /* Space from header */
+            padding: 1rem;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+        .cart-header {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+        .cart-items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+        .cart-items th, .cart-items td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        .cart-items th {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .cart-items tr:last-child td {
+            border-bottom: none;
+        }
+        .cart-item-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .cart-item-name {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        .cart-item-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .cart-item-actions button {
+            padding: 5px 8px;
+            font-size: 0.8rem;
+        }
+        .cart-summary {
+            text-align: right;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 2rem;
+        }
+        .checkout-btn-container {
+            text-align: right;
+        }
+        .empty-cart-message {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 1.1rem;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header id="header">
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNGE4ZjI5IiBkPSJNMjU2IDhDMTE5IDggOCAxMTkgOCAyNTZzMTExIDI0OCAyNDggMjQ4IDI0OC0xMTEgMjQ4LTI0OFMzOTMgOCAyNTYgOHptMCA0NDhjLTExMC41IDAtMjAwLTg5LjUtMjAwLTIwMFMxNDUuNSA1NiAyNTYgNTZzMjAwIDg5LjUgMjAwIDIwMC04OS41IDIwMC0yMDAgMjAwWm0xMDEuOC0yNjEuN2wtODQuOS02MS43Yy0zLjEtMi40LTcuNS0yLjgtMTEuMS0uN0MtMjU3LjEgMTk0LjEgMjU0IDIwNi45IDI1NCAyMjR2MTI4YzAgMTMuMyAxMC43IDI0IDI0IDI0czI0LTEwLjcgMjQtMjRWMjI0YzAtMjEuNS0xNi43LTQxLjgtNDAuMi00OC4zIDEzLjQgMTEuNyAyNi4yIDI0LjIgMzkuMSAzNy4zIDMuMiAzLjUgMi45IDkuMS0uOCAxMi4zcy05LjEgMi45LTEyLjMtLjhjLTE0LjUtMTUuNS0yOC4xLTMwLjEtNDEuMS00NC4yIDIuMy0uMiA0LjYtLjUgNi45LS41IDI0LjYgMCA0OS4xIDkuNCA2Ny4yIDI2LjMgMTYuMiAxNS4xIDI0LjggMzUuOSAyNC44IDU3LjcgMCAxMy4zIDEwLjcgMjQgMjQgMjRzMjQtMTAuNyAyNC0yNGMwLTMzLjEtMTIuOS02NC40LTM2LjMtODcuNy0yMy4zLTIzLjMtNTQuNi0zNi4xLTg3LjctMzYuMS0xMS4xIDAtMjEuOCAxLjctMzIuMiA0LjYtMTAuNS0xNC4yLTI2LjgtMjQuNi00NS4yLTI3LjEtMTUuOS0yLjEtMzAuNSA0LjYtNDEuMyAxNS40bC04NC45IDYxLjdjLTguMSA1LjktMTAuNCAxNy4xLTQuNiAyNS4yIDMuMiA0LjQgOC4xIDYuOCAxMy4yIDYuOCAzLjcgMCA3LjQtMS4yIDEwLjQtMy43bDg0LjktNjEuN2MxLjUtMS4xIDMuNS0xLjcgNS41LTEuNyAyLjcgMCA1LjIgMS4xIDcgMy4xIDEuOCAyLjEgMi43IDQuNyAyLjQgNy4zLS4zIDIuNi0xLjUgNS0zLjMgNi44bC0zMC4yIDMwLjJjLTMuMSAzLjEtMy4xIDguMiAwIDExLjMgMy4xIDMuMSA4LjIgMy4xIDExLjMgMGwzMC4yLTMwLjJjNS45LTUuOSA4LjktMTMuNiA4LjktMjEuNSAwLTguNi0zLjYtMTYuNy05LjktMjIuNS0xMC4xLTcuNS0yMi41LTE1LjQtMzUuMS0yNC42LTQ1LjItMjcuMS0xNS45LTIuMS0zMC41IDQuNi00MS4zIDE1LjRsLTg0LjkgNjEuN2MtOC4xIDUuOS0xMC40IDE3LjEtNC42IDI1LjIgMy4yIDQuNCA4LjEgNi44IDEzLjIgNi44IDMuNyAwIDcuNC0xLjIgMTAuNC0zLjd2LTEuNHoiLz48L3N2Zz4=" alt="Kaboy Agrovet Logo">
+                    <div class="logo-text">
+                        <h1>Kaboy Agrovet</h1>
+                        <p>Your Trusted Agri-Partner in Nchiru</p>
+                    </div>
+                </div>
+                <div class="cart-icon">
+                    🛒 <span id="cartItemCount" class="cart-count">0</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#products">Products</a></li>
+                    <li><a href="#gallery">Gallery</a></li>
+                    <li><a href="#testimonials">Testimonials</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <div class="hamburger">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="section">
+            <div class="container cart-page-container">
+                <h2 class="cart-header">Your Shopping Cart</h2>
+                <div id="cartContent">
+                    {# Cart items will be rendered here by JavaScript #}
+                </div>
+                <div id="checkoutFormContainer">
+                    <h3 class="checkout-header">Your Details for Order</h3>
+                    <form id="checkoutForm" class="checkout-form">
+                        <div class="form-group">
+                            <label for="checkoutName">Full Name</label>
+                            <input type="text" id="checkoutName" name="name" required>
+                            <small class="error-message" id="checkoutNameError"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="checkoutEmail">Email</label>
+                            <input type="email" id="checkoutEmail" name="email" required>
+                            <small class="error-message" id="checkoutEmailError"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="checkoutPhone">Phone Number</label>
+                            <input type="tel" id="checkoutPhone" name="phone" required>
+                            <small class="error-message" id="checkoutPhoneError"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="checkoutAddress">Delivery Address</label>
+                            <textarea id="checkoutAddress" name="address" rows="3" required></textarea>
+                            <small class="error-message" id="checkoutAddressError"></small>
+                        </div>
+                        <div class="checkout-actions">
+                            <button type="submit" class="btn btn-accent" id="completeOrderBtn">Complete Order</button>
+                        </div>
+                        <div id="checkoutFormMessage" class="form-message"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-col">
+                    <h3>Kaboy Agrovet</h3>
+                    <p>Your trusted agri-partner in Nchiru, providing quality agricultural products and services since 2015.</p>
+                    <div class="footer-social">
+                        <a href="#" class="social-icon">📱</a>
+                        <a href="#" class="social-icon">💻</a>
+                        <a href="#" class="social-icon">📘</a>
+                        <a href="#" class="social-icon">📸</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#products">Products</a></li>
+                        <li><a href="#gallery">Gallery</a></li>
+                        <li><a href="#testimonials">Testimonials</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Our Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Veterinary Services</a></li>
+                        <li><a href="#">Agronomic Advice</a></li>
+                        <li><a href="#">Animal Health Products</a></li>
+                        <li><a href="#">Farm Equipment</a></li>
+                        <li><a href="#">Delivery Services</a></li>
+                        <li><a href="#">Training Programs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Contact Info</h3>
+                    <p>Nchiru Town, Next to MUST</p>
+                    <p>Meru County, Kenya</p>
+                    <p>Phone: +254 720 576109</p>
+                    <p>Name: Martin Muthamia</p>
+                    <p>Email: info@kaboyagrovet.co.ke</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© <span id="year"></span> Kaboy Agrovet. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Call updateCartCount on cart page load
+        window.addEventListener('load', updateCartCount);
+        // This is a placeholder for cart page specific JS
+    </script>
+</body>
+</html> 

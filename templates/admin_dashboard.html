@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="admin-dashboard-container">
+        <h2>Admin Dashboard</h2>
+        <a href="{{ url_for('admin_logout') }}" class="btn">Logout</a>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th><th>Name</th><th>Phone</th><th>Product</th><th>Quantity</th><th>Ordered At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order[0] }}</td>
+                    <td>{{ order[1] }}</td>
+                    <td>{{ order[2] }}</td>
+                    <td>{{ order[3] }}</td>
+                    <td>{{ order[4] }}</td>
+                    <td>{{ order.ordered_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
