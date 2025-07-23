@@ -1,0 +1,92 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+<div class="container">
+    <h2 class="section-title" style="text-align: center; margin-bottom: 2rem;">Manual Store Sales Entry</h2>
+    <div class="manual-sale-container">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Add Items to Sale</h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="productVariantSearch">Search Product Variant</label>
+                    <input type="text" id="productVariantSearch" class="form-control" placeholder="Type product name or variant details...">
+                    <small class="error-message" id="productVariantSearchError"></small>
+                </div>
+                <div id="searchResults" class="list-group" style="max-height: 200px; overflow-y: auto; margin-top: 10px;">
+                    {# Search results will appear here #}
+                </div>
+                <div class="form-group">
+                    <label for="itemQuantity">Quantity</label>
+                    <input type="number" id="itemQuantity" class="form-control" value="1" min="1">
+                    <small class="error-message" id="itemQuantityError"></small>
+                </div>
+                <button class="btn btn-primary" id="addToSaleBtn" style="margin-top: 10px;">Add to Sale</button>
+            </div>
+        </div>
+        <div class="panel panel-default" style="margin-top: 2rem;">
+            <div class="panel-heading">
+                <h3 class="panel-title">Current Sale Items</h3>
+            </div>
+            <div class="panel-body">
+                <div id="saleItemsList">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Unit Price</th>
+                                <th>Qty</th>
+                                <th>Subtotal</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {# Sale items will be rendered here #}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-right">Total:</th>
+                                <th id="saleGrandTotal">KSh 0.00</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <p id="emptySaleMessage" style="text-align: center; color: #777; margin-top: 1rem;">No items added to sale yet.</p>
+            </div>
+        </div>
+        <div class="panel panel-default" style="margin-top: 2rem;">
+            <div class="panel-heading">
+                <h3 class="panel-title">Payment & Customer Details</h3>
+            </div>
+            <div class="panel-body">
+                <form id="manualSaleForm">
+                    <div class="form-group">
+                        <label for="customerName">Customer Name (Optional)</label>
+                        <input type="text" id="customerName" name="customer_name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="amountPaid">Amount Paid (KSh)</label>
+                        <input type="number" id="amountPaid" name="amount_paid" class="form-control" step="any" required>
+                        <small class="error-message" id="amountPaidError"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentMode">Payment Mode</label>
+                        <select id="paymentMode" name="payment_mode" class="form-control">
+                            <option value="Cash">Cash</option>
+                            <option value="Mpesa">Mpesa</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Change Due (KSh)</label>
+                        <p id="changeDue" class="form-control-static" style="font-weight: bold; font-size: 1.2em;">KSh 0.00</p>
+                    </div>
+                    <button type="submit" class="btn btn-accent btn-lg btn-block" id="completeSaleBtn">Complete Sale</button>
+                    <div id="manualSaleFormMessage" class="form-message" style="margin-top: 1rem;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/admin_manual_sale.js') }}"></script>
+{% endblock %}

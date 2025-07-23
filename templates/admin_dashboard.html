@@ -1,32 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Kaboy Agrovet</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+    <!-- Dashboard Hero Header -->
     <div class="admin-dashboard-container">
-        <h2>Admin Dashboard</h2>
-        <a href="{{ url_for('admin_logout') }}" class="btn">Logout</a>
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>ID</th><th>Name</th><th>Phone</th><th>Product</th><th>Quantity</th><th>Ordered At</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in orders %}
-                <tr>
-                    <td>{{ order[0] }}</td>
-                    <td>{{ order[1] }}</td>
-                    <td>{{ order[2] }}</td>
-                    <td>{{ order[3] }}</td>
-                    <td>{{ order[4] }}</td>
-                    <td>{{ order.ordered_at }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div style="width:100%;text-align:center;margin-bottom:2rem;">
+            <h2 style="font-size:2.5rem;color:var(--primary-color);font-weight:800;letter-spacing:2px;text-shadow:0 2px 10px rgba(74,143,41,0.15);margin-bottom:0.5rem;">
+                Kaboy Agrovet Admin Dashboard
+            </h2>
+            <p style="color:var(--text-light);font-size:1.2rem;">
+                Welcome, manage your sales, stock, and orders with ease!
+            </p>
+        </div>
+
+        <!-- Dashboard Stats Grid -->
+        <div class="dashboard-stats-grid">
+            <div class="stat-card" style="background:linear-gradient(135deg,#e8f5e9 60%,#fff 100%);box-shadow:0 8px 24px rgba(74,143,41,0.08);">
+                <h3><span style="font-size:1.5rem;">🛒</span> Online Orders</h3>
+                <p id="online-orders-count">Loading...</p>
+            </div>
+            <div class="stat-card" style="background:linear-gradient(135deg,#fffde7 60%,#fff 100%);box-shadow:0 8px 24px rgba(255,152,0,0.08);">
+                <h3><span style="font-size:1.5rem;">🏪</span> Offline Sales</h3>
+                <p id="offline-sales-count">Loading...</p>
+                <span style="color:var(--accent-color);font-size:1rem;" id="offline-items-count">Loading...</span>
+            </div>
+            <div class="stat-card" style="background:linear-gradient(135deg,#ffebee 60%,#fff 100%);box-shadow:0 8px 24px rgba(255,98,98,0.08);">
+                <h3><span style="font-size:1.5rem;">⚠️</span> Low Stock Alert</h3>
+                <p>
+                    <a href="#" id="low-stock-alert" class="text-danger" style="font-weight:600;">
+                        <span id="low-stock-count">Loading...</span> products low on stock
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div style="width:100%;height:2px;background:linear-gradient(90deg,var(--primary-color),var(--accent-color));margin:2.5rem 0 2rem 0;opacity:0.15;"></div>
+
+        <!-- Dashboard Charts Grid -->
+        <div class="dashboard-charts-grid">
+            <div class="chart-card">
+                <h3><span style="font-size:1.3rem;">📈</span> Sales Trend (Last 30 Days)</h3>
+                <canvas id="salesTrendChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3><span style="font-size:1.3rem;">📦</span> Current Stock Levels</h3>
+                <canvas id="stockLevelsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div style="width:100%;height:2px;background:linear-gradient(90deg,var(--primary-color),var(--accent-color));margin:2.5rem 0 2rem 0;opacity:0.15;"></div>
+
+        <!-- Recent Online Orders Table -->
+        <h3 class="section-title" style="text-align:left;color:var(--primary-color);margin-bottom:1.5rem;">
+            <span style="font-size:1.3rem;">📝</span> Recent Online Orders
+        </h3>
+        <div style="overflow-x:auto;">
+            <table class="admin-table" style="margin-bottom:2rem;">
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Total</th>
+                        <th>Order Date</th>
+                        <th>Payment Status</th>
+                        <th>Items Ordered</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.customer_name }}</td>
+                        <td>{{ order.customer_email }}</td>
+                        <td>{{ order.customer_phone }}</td>
+                        <td>{{ order.delivery_address }}</td>
+                        <td style="color:var(--primary-color);font-weight:600;">KSh {{ "%.2f"|format(order.total_amount) }}</td>
+                        <td>{{ order.ordered_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            {% set bg_color = '#e8f5e9' if order.payment_status == 'Paid' else '#fffde7' if order.payment_status == 'Pending' else '#ffebee' %}
+                            {% set text_color = 'var(--primary-color)' if order.payment_status == 'Paid' else 'var(--accent-color)' if order.payment_status == 'Pending' else '#d32f2f' %}
+                            <span style="padding:0.3em 0.8em;border-radius:20px;background-color:{{ bg_color }};color:{{ text_color }};font-weight:600;">
+                                {{ order.payment_status }}
+                            </span>
+                        </td>
+                        <td>{{ order.items|join('<br>')|safe }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+    <!-- Link to dashboard charts JS -->
+    <script src="{{ url_for('static', filename='js/admin_dashboard_charts.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/admin-dashboard.js') }}"></script>
+</body>
+</html>
+                            </span>
+                        </td>
+                        <td>{{ order.items|join('<br>')|safe }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Link to dashboard charts JS -->
+    <script src="{{ url_for('static', filename='js/admin_dashboard_charts.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/admin-dashboard.js') }}"></script>
 </body>
 </html>

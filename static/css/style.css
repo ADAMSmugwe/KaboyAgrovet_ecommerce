@@ -1209,6 +1209,58 @@ footer {
     align-self: center; /* Center the logout button */
 } 
 
+/* Dashboard Stats Grid */
+.dashboard-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background-color: var(--white);
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.stat-card h3 {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card p {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 0;
+}
+
+/* Dashboard Charts Grid */
+.dashboard-charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.chart-card {
+    background-color: var(--white);
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+.chart-card h3 {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
 /* Order Modal Styles */
 .order-modal-overlay {
     position: fixed;
@@ -1472,4 +1524,86 @@ footer {
 .checkout-actions .btn {
     padding: 0.9rem 2rem;
     font-size: 1.1rem;
-} 
+}
+
+/* Manual Sale Page Specific Styles */
+.manual-sale-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: var(--light-color);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+.manual-sale-container .panel {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.manual-sale-container .panel-heading {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--dark-color);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.manual-sale-container .panel-body {
+    padding: 1.5rem;
+    background-color: var(--white);
+}
+
+.manual-sale-container .form-group label {
+    font-weight: 500;
+}
+
+.manual-sale-container .search-input {
+    margin-bottom: 0.5rem;
+}
+
+.manual-sale-container .list-group-item {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.manual-sale-container .list-group-item:hover {
+    background-color: var(--light-color);
+}
+
+.manual-sale-container table {
+    width: 100%;
+    margin-top: 1rem;
+    border-collapse: collapse;
+}
+
+.manual-sale-container table th,
+.manual-sale-container table td {
+    padding: 10px;
+    border: 1px solid #eee;
+    text-align: left;
+}
+
+.manual-sale-container table th {
+    background-color: var(--secondary-color);
+    color: var(--white);
+}
+
+.manual-sale-container table tfoot th {
+    background-color: var(--light-color);
+    color: var(--dark-color);
+}
+
+.manual-sale-container .remove-sale-item {
+    padding: 5px 10px;
+    font-size: 0.8em;
+}
+
+.manual-sale-container #changeDue {
+    color: green;
+}
+.manual-sale-container #changeDue.negative {
+    color: red;
+}

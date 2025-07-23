@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 from flask import Flask, render_template, request, redirect, session, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timedelta # Add this import at the top
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_wtf import FlaskForm
@@ -16,6 +16,8 @@ from wtforms.widgets import TextInput
 from flask_admin import expose
 from wtforms.widgets import Select # Added for ProductForm category
 from flask_admin.form.widgets import Select2Widget # Added for ProductForm category
+from sqlalchemy.orm import Session
+from flask_admin import BaseView, expose # Ensure BaseView and expose are imported
 
 load_dotenv()
 
@@ -129,10 +131,15 @@ class ProductVariant(db.Model):
     quantity_unit = db.Column(db.String(20), nullable=False)
     selling_price = db.Column(db.Float, nullable=False)
     buying_price = db.Column(db.Float, nullable=True)
+    stock_level = db.Column(db.Integer, default=0, nullable=False)
+    
+    # ADD THESE TWO LINES:
+    expiry_date = db.Column(db.DateTime, nullable=True) # Optional expiry date, can be None
+    supplier = db.Column(db.String(100), nullable=True) # Optional supplier name, can be None
 
     def __repr__(self):
         product_name = self.product.name if self.product else "N/A"
-        return f'<Variant {self.quantity_value}{self.quantity_unit} of {product_name}>'
+        return f'<Variant {self.quantity_value}{self.quantity_unit} of {product_name} (Stock: {self.stock_level})>'
 
     def to_dict(self):
         return {
@@ -140,6 +147,10 @@ class ProductVariant(db.Model):
             'quantity_value': self.quantity_value,
             'quantity_unit': self.quantity_unit,
             'selling_price': self.selling_price,
+            'stock_level': self.stock_level,
+            # Include new fields in to_dict for API response
+            'expiry_date': self.expiry_date.isoformat() if self.expiry_date else None, # Format for JSON
+            'supplier': self.supplier
         }
 
 class ContactMessage(db.Model):
@@ -172,8 +183,47 @@ class OrderItem(db.Model):
         variant_info = f"{self.quantity} x {self.variant.product.name} ({self.variant.quantity_value}{self.variant.quantity_unit})" if self.variant and self.variant.product else "N/A"
         return f"{self.quantity} x {variant_info} @ KSh {self.price_at_purchase}"
 
+class OfflineSale(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    customer_name = db.Column(db.String(100), nullable=True) # Optional for walk-in
+    amount_paid = db.Column(db.Float, nullable=False)
+    change_given = db.Column(db.Float, nullable=False)
+    payment_mode = db.Column(db.String(50), nullable=False) # e.g., 'Cash', 'Mpesa'
+    total_cost = db.Column(db.Float, nullable=False) # Calculated total of items sold
+    sale_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship to OfflineSaleItem (one-to-many)
+    items_sold = db.relationship('OfflineSaleItem', backref='offline_sale', lazy=True, cascade='all, delete-orphan')
+
+    def __repr__(self):
+        customer = self.customer_name if self.customer_name else "Walk-in"
+        return f'<Offline Sale {self.id} by {customer} - Total: {self.total_cost} ({self.payment_mode})>'
+
+    def __str__(self):
+        customer = self.customer_name if self.customer_name else "Walk-in"
+        return f"Offline Sale {self.id} by {customer} - KSh {self.total_cost:.2f} ({self.payment_mode})"
+
+class OfflineSaleItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    offline_sale_id = db.Column(db.Integer, db.ForeignKey('offline_sale.id'), nullable=False) # Links to parent OfflineSale
+    product_variant_id = db.Column(db.Integer, db.ForeignKey('product_variant.id'), nullable=False)
+
+    # Relationship to ProductVariant to get details
+    variant = db.relationship('ProductVariant', backref='offline_sale_items', lazy=True) 
+
+    quantity = db.Column(db.Integer, nullable=False)
+    price_at_sale = db.Column(db.Float, nullable=False) # Price at time of sale
+
+    def __repr__(self):
+        variant_info = f"{self.variant.product.name} ({self.variant.quantity_value}{self.variant.quantity_unit})" if self.variant and self.variant.product else "N/A"
+        return f'<Offline Sale Item {self.id} - {self.quantity} x {variant_info}>'
+
+    def __str__(self):
+        variant_info = f"{self.quantity} x {self.variant.product.name} ({self.variant.quantity_value}{self.variant.quantity_unit})" if self.variant and self.variant.product else "N/A"
+        return f"{self.quantity} x {variant_info} @ KSh {self.price_at_sale}"
+
 class ProductVariantInlineForm(FlaskForm):
-    id = HiddenField()
+    id = HiddenField()  # <-- Ensure this line exists!
     quantity_value = FloatField('Quantity Value')
     quantity_unit = StringField('Unit', widget=TextInput())
     selling_price = FloatField('Selling Price')
@@ -225,8 +275,8 @@ class ProductAdminView(MyAdminModelView):
     ]
 
 class ProductVariantAdminView(MyAdminModelView):
-    column_list = ['product', 'quantity_value', 'quantity_unit', 'selling_price', 'buying_price']
-    form_columns = ['product', 'quantity_value', 'quantity_unit', 'selling_price', 'buying_price']
+    column_list = ['product', 'quantity_value', 'quantity_unit', 'selling_price', 'buying_price', 'stock_level'] # ADD 'stock_level' here
+    form_columns = ['product', 'quantity_value', 'quantity_unit', 'selling_price', 'buying_price', 'stock_level'] # ADD 'stock_level' here
     column_labels = {
         'product': 'Associated Product'
     }
@@ -275,6 +325,45 @@ class OrderItemAdminView(MyAdminModelView):
         }
     }
 
+# --- Add new AdminViews for OfflineSale and OfflineSaleItem ---
+class OfflineSaleAdminView(MyAdminModelView):
+    column_list = ['customer_name', 'total_cost', 'amount_paid', 'change_given', 'payment_mode', 'sale_date', 'items_sold']
+    column_labels = {
+        'customer_name': 'Customer Name',
+        'total_cost': 'Total Cost',
+        'amount_paid': 'Amount Paid',
+        'change_given': 'Change Given',
+        'payment_mode': 'Payment Mode',
+        'sale_date': 'Sale Date',
+        'items_sold': 'Items Sold'
+    }
+    form_columns = ['customer_name', 'total_cost', 'amount_paid', 'change_given', 'payment_mode']
+
+class OfflineSaleItemAdminView(MyAdminModelView):
+    column_list = ['offline_sale', 'variant', 'quantity', 'price_at_sale']
+    column_labels = {
+        'offline_sale': 'Parent Sale',
+        'variant': 'Product Variant',
+        'quantity': 'Quantity',
+        'price_at_sale': 'Price at Sale'
+    }
+    form_columns = ['offline_sale', 'product_variant_id', 'quantity', 'price_at_sale']
+    # FIX: Use 'variant' (relationship) instead of 'product_variant_id' (column) for AJAX refs
+    form_ajax_refs = {
+        'offline_sale': {
+            'fields': ['customer_name', 'sale_date'],
+            'get_label': lambda s: f"Sale {s.id} by {s.customer_name or 'Walk-in'} on {s.sale_date.strftime('%Y-%m-%d')}"
+        },
+        'variant': {
+            'fields': ['quantity_value', 'quantity_unit'],
+            'get_label': lambda v: f"{v.product.name} ({v.quantity_value}{v.quantity_unit})" if v.product else f"Variant {v.id}"
+        }
+    }
+
+class ManualSaleView(BaseView):
+    @expose('/')
+    def index(self):
+        return self.render('admin/manual_sale.html')
 
 # --- ADMIN ADD VIEWS ---
 admin.add_view(OrderAdminView(Order, db.session, name='Customer Orders'))
@@ -284,6 +373,9 @@ admin.add_view(MyAdminModelView(Testimonial, db.session, name='Testimonials'))
 admin.add_view(MyAdminModelView(FAQ, db.session, name='FAQs'))
 admin.add_view(MyAdminModelView(ContactMessage, db.session, name='Contact Messages'))
 admin.add_view(OrderItemAdminView(OrderItem, db.session, name='Order Items'))
+admin.add_view(OfflineSaleAdminView(OfflineSale, db.session, name='Offline Sales'))
+admin.add_view(OfflineSaleItemAdminView(OfflineSaleItem, db.session, name='Offline Sale Items'))
+admin.add_view(ManualSaleView(name='Manual Sales', endpoint='manual_sale')) # Add this line
 
 
 # --- ROUTES ---
@@ -364,6 +456,7 @@ def submit_full_order():
         total_amount = 0.0
         order_items = []
 
+        # Process each item in the cart
         for item_data in items_data:
             product_variant_id = item_data.get('product_variant_id')
             quantity = item_data.get('quantity')
@@ -380,10 +473,23 @@ def submit_full_order():
             except ValueError:
                 return jsonify({'status': 'error', 'message': 'Invalid quantity or price format for an item.'}), 400
 
+            # --- NEW: Check and Deduct Stock Level ---
+            variant = db.session.get(ProductVariant, product_variant_id)
+            if not variant:
+                db.session.rollback()
+                return jsonify({'status': 'error', 'message': f'Product variant with ID {product_variant_id} not found.'}), 400
+
+            if variant.stock_level < quantity_int:
+                db.session.rollback()
+                return jsonify({'status': 'error', 'message': f'Not enough stock for {variant.product.name} ({variant.quantity_value}{variant.quantity_unit}). Available: {variant.stock_level}'}), 400
+
+            variant.stock_level -= quantity_int
+            print(f"Stock for variant {variant.id} reduced to {variant.stock_level}")
+            # --- END NEW Stock Deduction ---
+
             total_amount += (selling_price_float * quantity_int)
 
             order_items.append(OrderItem(
-                order_id=None, # This will be set after order creation
                 product_variant_id=product_variant_id,
                 quantity=quantity_int,
                 price_at_purchase=selling_price_float
@@ -434,6 +540,13 @@ def admin_dashboard():
 
     return render_template('admin_dashboard.html', orders=orders)
 
+# Add a new route for the manual sales page (accessible only by admin)
+@app.route('/admin/manual-sale')
+def manual_sale_page():
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin_login'))
+    return render_template('admin/manual_sale.html')
+
 @app.route('/admin-logout')
 def admin_logout():
     session.pop('admin_logged_in', None)
@@ -442,6 +555,185 @@ def admin_logout():
 @app.route('/cart')
 def cart_page():
     return render_template('cart.html')
+
+@app.route('/api/manual-sale', methods=['POST'])
+def api_manual_sale():
+    if not session.get('admin_logged_in'):
+        return jsonify({'status': 'error', 'message': 'Unauthorized'}), 403
+    try:
+        data = request.json
+        customer_name = data.get('customer_name')
+        amount_paid = data.get('amount_paid')
+        change_given = data.get('change_given')
+        payment_mode = data.get('payment_mode')
+        total_cost = data.get('total_cost')
+        items_sold = data.get('items_sold', [])
+
+        # Validate required fields
+        if amount_paid is None or change_given is None or payment_mode is None or total_cost is None or not items_sold:
+            return jsonify({'status': 'error', 'message': 'Missing required sale details.'}), 400
+
+        # Create OfflineSale
+        sale = OfflineSale(
+            customer_name=customer_name,
+            amount_paid=amount_paid,
+            change_given=change_given,
+            payment_mode=payment_mode,
+            total_cost=total_cost
+        )
+        db.session.add(sale)
+        db.session.flush()  # Get sale.id before committing
+
+        # Add items and deduct stock
+        for item in items_sold:
+            variant_id = item.get('product_variant_id')
+            quantity = item.get('quantity')
+            price_at_sale = item.get('price_at_sale')
+            if not variant_id or not quantity or price_at_sale is None:
+                db.session.rollback()
+                return jsonify({'status': 'error', 'message': 'Invalid item data.'}), 400
+            variant = db.session.get(ProductVariant, variant_id)
+            if not variant:
+                db.session.rollback()
+                return jsonify({'status': 'error', 'message': f'Product variant ID {variant_id} not found.'}), 400
+            if variant.stock_level < quantity:
+                db.session.rollback()
+                return jsonify({'status': 'error', 'message': f'Not enough stock for {variant.product.name} ({variant.quantity_value}{variant.quantity_unit}). Available: {variant.stock_level}'}), 400
+            variant.stock_level -= quantity
+            sale_item = OfflineSaleItem(
+                offline_sale_id=sale.id,
+                product_variant_id=variant_id,
+                quantity=quantity,
+                price_at_sale=price_at_sale
+            )
+            db.session.add(sale_item)
+
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': f'Sale recorded successfully!'}), 200
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error saving manual sale: {e}")
+        return jsonify({'status': 'error', 'message': 'Failed to record sale. Please try again.'}), 500
+
+# --- NEW: API Endpoints for Dashboard Charts Data ---
+@app.route('/api/dashboard/stats')
+def get_dashboard_stats():
+    try:
+        # Total Sales (from online orders)
+        total_online_sales = db.session.query(db.func.sum(Order.total_amount)).scalar() or 0.0
+
+        # Total Sales (from offline sales) with SQL-level NULL handling
+        total_offline_sales = db.session.query(
+            db.func.coalesce(db.func.sum(OfflineSale.total_cost), 0.0)
+        ).scalar()
+
+        # Get count of offline sale items
+        offline_sales_items_count = db.session.query(
+            db.func.sum(OfflineSaleItem.quantity)
+        ).scalar() or 0
+
+        total_sales = total_online_sales + total_offline_sales
+
+        # Low Stock Alerts (ProductVariants with stock_level < 10, adjust threshold as needed)
+        low_stock_variants = ProductVariant.query.filter(ProductVariant.stock_level < 10).all()
+        low_stock_count = len(low_stock_variants)  # Define low_stock_count here
+        low_stock_items = []
+        
+        for v in low_stock_variants:
+            product = v.product
+            if product:
+                low_stock_items.append({
+                    'id': v.id,
+                    'name': product.name,
+                    'variant': f"{v.quantity_value}{v.quantity_unit}",
+                    'stock': v.stock_level,
+                    'category': product.category,
+                    'selling_price': v.selling_price,
+                    'expiry_date': v.expiry_date.strftime('%Y-%m-%d') if v.expiry_date else None,
+                })
+
+        # Total Inventory Value (sum of selling_price * stock_level for all variants)
+        total_inventory_value = db.session.query(db.func.sum(ProductVariant.selling_price * ProductVariant.stock_level)).scalar() or 0
+
+        # Total Orders (online)
+        total_online_orders = Order.query.count()
+
+        # Total Offline Sales (transactions)
+        total_offline_transactions = OfflineSale.query.count()
+
+        # Today's Orders (online)
+        today = datetime.utcnow().date()
+        todays_online_orders = Order.query.filter(db.func.date(Order.ordered_at) == today).count()
+
+        # Today's Offline Sales (transactions)
+        todays_offline_sales = OfflineSale.query.filter(db.func.date(OfflineSale.sale_date) == today).count()
+
+        return jsonify({
+            'total_sales': float(total_sales),
+            'low_stock_count': low_stock_count,
+            'total_inventory_value': float(total_inventory_value),
+            'total_online_orders': total_online_orders,
+            'total_offline_transactions': total_offline_transactions,
+            'offline_sales_items_count': offline_sales_items_count,  # New field
+            'todays_online_orders': todays_online_orders,
+            'todays_offline_sales': todays_offline_sales,
+            'low_stock_items': low_stock_items  # Enhanced low stock items data
+        })
+    except Exception as e:
+        print(f"Error fetching dashboard stats: {e}")
+        db.session.rollback()  # Ensure session is rolled back on error
+        return jsonify({
+            'status': 'error',
+            'message': 'Failed to load dashboard statistics'
+        }), 500
+
+@app.route('/api/dashboard/sales-trends')
+def get_sales_trends():
+    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+
+    # Online Sales
+    online_sales_data = db.session.query(
+        db.func.date(Order.ordered_at),
+        db.func.sum(Order.total_amount)
+    ).filter(Order.ordered_at >= thirty_days_ago).group_by(db.func.date(Order.ordered_at)).all()
+
+    # Offline Sales
+    offline_sales_data = db.session.query(
+        db.func.date(OfflineSale.sale_date),
+        db.func.sum(OfflineSale.total_cost)
+    ).filter(OfflineSale.sale_date >= thirty_days_ago).group_by(db.func.date(OfflineSale.sale_date)).all()
+
+    # Combine and format data
+    sales_by_date = {}
+    # Fix: db.func.date returns a string, not a date object
+    for date, amount in online_sales_data:
+        sales_by_date[str(date)] = sales_by_date.get(str(date), 0) + float(amount)
+    for date, amount in offline_sales_data:
+        sales_by_date[str(date)] = sales_by_date.get(str(date), 0) + float(amount)
+
+    labels = [(datetime.utcnow() - timedelta(days=i)).date().isoformat() for i in range(30)][::-1]
+    data = [sales_by_date.get(label, 0) for label in labels]
+
+    return jsonify({
+        'labels': labels,
+        'data': data
+    })
+
+@app.route('/api/dashboard/stock-levels')
+def get_stock_levels():
+    # Get top 10 products by current stock level (or all if less than 10)
+    variants = ProductVariant.query.order_by(ProductVariant.stock_level.desc()).limit(10).all()
+
+    labels = []
+    data = []
+    for v in variants:
+        labels.append(f"{v.product.name} ({v.quantity_value}{v.quantity_unit})")
+        data.append(v.stock_level)
+
+    return jsonify({
+        'labels': labels,
+        'data': data
+    })
 
 if __name__ == '__main__':
     with app.app_context():
