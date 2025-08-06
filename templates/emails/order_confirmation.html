@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - Kaboy Agrovet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .title {
+            color: #4a8f29;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .content {
+            margin: 20px 0;
+        }
+        .order-details {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .order-items {
+            margin: 20px 0;
+        }
+        .item {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+        .item:last-child {
+            border-bottom: none;
+        }
+        .total {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: right;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #155724;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+        .contact-info {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1 style="color: #4a8f29; margin: 0;">Kaboy Agrovet</h1>
+            <p style="color: #666; margin: 5px 0;">Your Trusted Agri-Partner in Nchiru</p>
+        </div>
+
+        <div class="content">
+            <h2 class="title">Order Confirmation</h2>
+            
+            <div class="success">
+                <h3>✅ Thank you for your order!</h3>
+                <p>Dear {{ order.customer_name }},</p>
+                <p>We have received your order and it is being processed. Here are your order details:</p>
+            </div>
+            
+            <div class="order-details">
+                <h3>Order Information</h3>
+                <p><strong>Order Number:</strong> #{{ order.id }}</p>
+                <p><strong>Order Date:</strong> {{ order.ordered_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                <p><strong>Customer:</strong> {{ order.customer_name }}</p>
+                <p><strong>Email:</strong> {{ order.customer_email }}</p>
+                <p><strong>Phone:</strong> {{ order.customer_phone }}</p>
+                <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
+                <p><strong>Payment Status:</strong> <span style="color: #28a745;">{{ order.payment_status }}</span></p>
+            </div>
+            
+            <div class="order-items">
+                <h3>Order Items</h3>
+                {% for item in order.items %}
+                <div class="item">
+                    <p><strong>{{ item.variant.product.name }}</strong></p>
+                    <p>Quantity: {{ item.quantity }} x {{ item.variant.quantity_value }}{{ item.variant.quantity_unit }}</p>
+                    <p>Price: KSh {{ "%.2f"|format(item.price_at_purchase) }} each</p>
+                    <p>Subtotal: KSh {{ "%.2f"|format(item.quantity * item.price_at_purchase) }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="total">
+                <p>Total Amount: KSh {{ "%.2f"|format(order.total_amount) }}</p>
+            </div>
+            
+            <div class="contact-info">
+                <h3>📞 Contact Information</h3>
+                <p><strong>Kaboy Agrovet</strong></p>
+                <p>📍 Nchiru, Kenya</p>
+                <p>📍 Next to Meru University of Science and Technology</p>
+                <p>📧 Email: info@kaboyagrovet.com</p>
+                <p>📱 Phone: +254 XXX XXX XXX</p>
+            </div>
+            
+            <div style="background-color: #e8f5e9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <h3>🚚 Delivery Information</h3>
+                <p>We will contact you shortly to confirm your order and arrange delivery. Delivery typically takes 1-3 business days within Nchiru and surrounding areas.</p>
+                <p><strong>Note:</strong> Please ensure someone is available at the delivery address during business hours.</p>
+            </div>
+            
+            <div style="background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <h3>💡 Need Help?</h3>
+                <p>If you have any questions about your order, please don't hesitate to contact us:</p>
+                <ul>
+                    <li>Call us during business hours</li>
+                    <li>Email us at info@kaboyagrovet.com</li>
+                    <li>Visit our store in Nchiru</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Thank you for choosing Kaboy Agrovet!</p>
+            <p>© 2024 Kaboy Agrovet. All rights reserved.</p>
+            <p>Your Trusted Agri-Partner in Nchiru</p>
+        </div>
+    </div>
+</body>
+</html> 

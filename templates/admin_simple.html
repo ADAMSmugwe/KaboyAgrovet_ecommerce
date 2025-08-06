@@ -1,0 +1,20 @@
+{% extends 'admin/base.html' %}
+
+{% block access_control %}
+{% if current_user.is_authenticated %}
+<div class="navbar-text btn-group pull-right">
+    <a href="{{ url_for('admin_logout') }}" class="btn btn-danger">Logout</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block page_body %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Kaboy Agrovet Admin</h1>
+            <p>Welcome to the admin panel. Use the navigation menu to manage your data.</p>
+        </div>
+    </div>
+</div>
+{% endblock %} 

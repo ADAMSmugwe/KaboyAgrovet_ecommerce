@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Email - Kaboy Agrovet Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .test-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .config-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>📧 Email Configuration Test</h1>
+        <p>This page allows you to test your email configuration for the Kaboy Agrovet admin system.</p>
+        
+        <div class="config-info">
+            <h3>Current Email Configuration:</h3>
+            <p><strong>Server:</strong> {{ config.server or 'Not set' }}</p>
+            <p><strong>Port:</strong> {{ config.port or 'Not set' }}</p>
+            <p><strong>TLS:</strong> {{ config.tls or 'Not set' }}</p>
+            <p><strong>Username:</strong> {{ config.username or 'Not set' }}</p>
+            <p><strong>Password:</strong> {{ '***' if config.password else 'Not set' }}</p>
+        </div>
+        
+        <button class="test-button" onclick="sendTestEmail()" id="testBtn">
+            Send Test Email
+        </button>
+        
+        <div id="result" class="result"></div>
+        
+        <div style="margin-top: 30px;">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Make sure you have set up your <code>.env</code> file with the correct email credentials</li>
+                <li>Click the "Send Test Email" button above</li>
+                <li>Check your email inbox for the test message</li>
+                <li>If successful, you can proceed with implementing the password reset feature</li>
+            </ol>
+            
+            <h3>Example .env configuration:</h3>
+            <div class="config-info">
+                <pre>MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password</pre>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="{{ url_for('admin_dashboard') }}" class="test-button" style="text-decoration: none; display: inline-block;">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script>
+        async function sendTestEmail() {
+            const button = document.getElementById('testBtn');
+            const result = document.getElementById('result');
+            
+            // Disable button and show loading
+            button.disabled = true;
+            button.textContent = 'Sending...';
+            result.style.display = 'none';
+            
+            try {
+                const response = await fetch('/admin/test-email');
+                const data = await response.json();
+                
+                result.style.display = 'block';
+                result.className = `result ${data.status}`;
+                
+                if (data.status === 'success') {
+                    result.innerHTML = `
+                        <h4>✅ Success!</h4>
+                        <p>${data.message}</p>
+                        <p><strong>Check your email inbox for the test message.</strong></p>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <h4>❌ Error</h4>
+                        <p>${data.message}</p>
+                        <p><strong>Please check your email configuration in the .env file.</strong></p>
+                    `;
+                }
+            } catch (error) {
+                result.style.display = 'block';
+                result.className = 'result error';
+                result.innerHTML = `
+                    <h4>❌ Network Error</h4>
+                    <p>Failed to send test email: ${error.message}</p>
+                `;
+            } finally {
+                // Re-enable button
+                button.disabled = false;
+                button.textContent = 'Send Test Email';
+            }
+        }
+    </script>
+</body>
+</html> 

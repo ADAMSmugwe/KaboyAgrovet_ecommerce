@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <title>Admin Dashboard - Kaboy Agrovet</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
 </head>
 <body>
-    <!-- Dashboard Hero Header -->
     <div class="admin-dashboard-container">
         <div style="width:100%;text-align:center;margin-bottom:2rem;">
             <h2 style="font-size:2.5rem;color:var(--primary-color);font-weight:800;letter-spacing:2px;text-shadow:0 2px 10px rgba(74,143,41,0.15);margin-bottom:0.5rem;">
@@ -16,17 +17,43 @@
             <p style="color:var(--text-light);font-size:1.2rem;">
                 Welcome, manage your sales, stock, and orders with ease!
             </p>
+            
+            <!-- Admin Navigation -->
+            <div style="margin-top:1.5rem;display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;">
+                <a href="{{ url_for('admin.index') }}" class="admin-nav-btn" style="background:var(--primary-color);color:white;padding:0.5rem 1rem;border-radius:5px;text-decoration:none;font-weight:600;transition:all 0.2s ease;">
+                    📊 Flask-Admin
+                </a>
+                <button onclick="openManualSaleModal()" class="admin-nav-btn" style="background:var(--accent-color);color:white;padding:0.5rem 1rem;border-radius:5px;text-decoration:none;font-weight:600;transition:all 0.2s ease;border:none;cursor:pointer;">
+                    💰 Manual Sales
+                </button>
+                <a href="{{ url_for('send_marketing_email_route') }}" class="admin-nav-btn" style="background:#28a745;color:white;padding:0.5rem 1rem;border-radius:5px;text-decoration:none;font-weight:600;transition:all 0.2s ease;">
+                    📢 Marketing Email
+                </a>
+                <a href="{{ url_for('analytics_dashboard') }}" class="admin-nav-btn" style="background:#6f42c1;color:white;padding:0.5rem 1rem;border-radius:5px;text-decoration:none;font-weight:600;transition:all 0.2s ease;">
+                    📊 Advanced Analytics
+                </a>
+                <a href="{{ url_for('admin_logout') }}" class="admin-nav-btn" style="background:#dc3545;color:white;padding:0.5rem 1rem;border-radius:5px;text-decoration:none;font-weight:600;transition:all 0.2s ease;">
+                    🚪 Logout
+                </a>
+            </div>
         </div>
 
-        <!-- Dashboard Stats Grid -->
         <div class="dashboard-stats-grid">
-            <div class="stat-card" style="background:linear-gradient(135deg,#e8f5e9 60%,#fff 100%);box-shadow:0 8px 24px rgba(74,143,41,0.08);">
+            <div class="stat-card" style="background:linear-gradient(135deg,#e8f5e9 60%,#fff 100%);box-shadow:0 8px 24px rgba(74,143,41,0.08);cursor:pointer;transition:transform 0.2s ease;" onclick="showOnlineOrdersModal()">
                 <h3><span style="font-size:1.5rem;">🛒</span> Online Orders</h3>
-                <p id="online-orders-count">Loading...</p>
+                <p>
+                    <a href="#" id="online-orders-alert" style="color:var(--primary-color);text-decoration:none;font-weight:600;">
+                        <span id="online-orders-count">Loading...</span> orders today
+                    </a>
+                </p>
             </div>
-            <div class="stat-card" style="background:linear-gradient(135deg,#fffde7 60%,#fff 100%);box-shadow:0 8px 24px rgba(255,152,0,0.08);">
+            <div class="stat-card" style="background:linear-gradient(135deg,#fffde7 60%,#fff 100%);box-shadow:0 8px 24px rgba(255,152,0,0.08);cursor:pointer;transition:transform 0.2s ease;" onclick="showOfflineSalesModal()">
                 <h3><span style="font-size:1.5rem;">🏪</span> Offline Sales</h3>
-                <p id="offline-sales-count">Loading...</p>
+                <p>
+                    <a href="#" id="offline-sales-alert" style="color:var(--accent-color);text-decoration:none;font-weight:600;">
+                        <span id="offline-sales-count">Loading...</span> sales today
+                    </a>
+                </p>
                 <span style="color:var(--accent-color);font-size:1rem;" id="offline-items-count">Loading...</span>
             </div>
             <div class="stat-card" style="background:linear-gradient(135deg,#ffebee 60%,#fff 100%);box-shadow:0 8px 24px rgba(255,98,98,0.08);">
@@ -39,10 +66,42 @@
             </div>
         </div>
 
-        <!-- Divider -->
         <div style="width:100%;height:2px;background:linear-gradient(90deg,var(--primary-color),var(--accent-color));margin:2.5rem 0 2rem 0;opacity:0.15;"></div>
 
-        <!-- Dashboard Charts Grid -->
+        <div class="dashboard-data-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem;">
+            <!-- Recent Online Orders -->
+            <div class="data-card" style="background:white;border-radius:10px;padding:1.5rem;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                <h3 style="color:var(--primary-color);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;">
+                    <span style="font-size:1.3rem;">🛒</span> Recent Online Orders
+                </h3>
+                <div id="recentOnlineOrders" style="max-height:300px;overflow-y:auto;">
+                    <p style="text-align:center;color:var(--text-light);">Loading recent orders...</p>
+                </div>
+            </div>
+
+            <!-- Recent Offline Sales -->
+            <div class="data-card" style="background:white;border-radius:10px;padding:1.5rem;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                <h3 style="color:var(--accent-color);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;">
+                    <span style="font-size:1.3rem;">🏪</span> Recent Offline Sales
+                </h3>
+                <div id="recentOfflineSales" style="max-height:300px;overflow-y:auto;">
+                    <p style="text-align:center;color:var(--text-light);">Loading recent sales...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Low Stock Products -->
+        <div class="data-card" style="background:white;border-radius:10px;padding:1.5rem;box-shadow:0 4px 12px rgba(0,0,0,0.1);margin-bottom:2rem;">
+            <h3 style="color:#d32f2f;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;">
+                <span style="font-size:1.3rem;">⚠️</span> Products Low on Stock
+            </h3>
+            <div id="lowStockProducts" style="max-height:300px;overflow-y:auto;">
+                <p style="text-align:center;color:var(--text-light);">Loading low stock products...</p>
+            </div>
+        </div>
+
+        <div style="width:100%;height:2px;background:linear-gradient(90deg,var(--primary-color),var(--accent-color));margin:2.5rem 0 2rem 0;opacity:0.15;"></div>
+
         <div class="dashboard-charts-grid">
             <div class="chart-card">
                 <h3><span style="font-size:1.3rem;">📈</span> Sales Trend (Last 30 Days)</h3>
@@ -54,12 +113,10 @@
             </div>
         </div>
 
-        <!-- Divider -->
         <div style="width:100%;height:2px;background:linear-gradient(90deg,var(--primary-color),var(--accent-color));margin:2.5rem 0 2rem 0;opacity:0.15;"></div>
 
-        <!-- Recent Online Orders Table -->
         <h3 class="section-title" style="text-align:left;color:var(--primary-color);margin-bottom:1.5rem;">
-            <span style="font-size:1.3rem;">📝</span> Recent Online Orders
+            <span style="font-size:1.3rem;">📝</span> All Online Orders
         </h3>
         <div style="overflow-x:auto;">
             <table class="admin-table" style="margin-bottom:2rem;">
@@ -91,35 +148,382 @@
                                 {{ order.payment_status }}
                             </span>
                         </td>
-                        <td>{{ order.items|join('<br>')|safe }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <!-- Link to dashboard charts JS -->
-    <script src="{{ url_for('static', filename='js/admin_dashboard_charts.js') }}"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/admin-dashboard.js') }}"></script>
-</body>
-</html>
-                            </span>
+                        <td>
+                            <ul style="padding-left: 0; margin-bottom: 0; list-style-type: none;">
+                                {% for item in order.items %}
+                                <li>{{ item }}</li>
+                                {% endfor %}
+                            </ul>
                         </td>
-                        <td>{{ order.items|join('<br>')|safe }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
-    <!-- Link to dashboard charts JS -->
-    <script src="{{ url_for('static', filename='js/admin_dashboard_charts.js') }}"></script>
+
+    <div id="lowStockModal" class="modal" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;overflow:auto;background-color:rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color:#fefefe;margin:15% auto;padding:20px;border:none;border-radius:10px;width:80%;max-width:800px;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+            <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:2px solid var(--light-color);padding-bottom:15px;">
+                <h2 style="color:var(--primary-color);margin:0;font-size:1.8rem;">
+                    <span style="font-size:1.5rem;">⚠️</span> Low Stock Products
+                </h2>
+                <span class="close" style="color:#aaa;font-size:28px;font-weight:bold;cursor:pointer;">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="lowStockProductsList" style="max-height:400px;overflow-y:auto;">
+                    <p style="text-align:center;color:var(--text-light);">Loading low stock products...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="offlineSalesModal" class="modal" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;overflow:auto;background-color:rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color:#fefefe;margin:10% auto;padding:20px;border:none;border-radius:10px;width:90%;max-width:900px;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+            <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:2px solid var(--light-color);padding-bottom:15px;">
+                <h2 style="color:var(--primary-color);margin:0;font-size:1.8rem;">
+                    <span style="font-size:1.5rem;">🏪</span> Recent Offline Sales
+                </h2>
+                <span class="close" style="color:#aaa;font-size:28px;font-weight:bold;cursor:pointer;">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="offlineSalesList" style="max-height:500px;overflow-y:auto;">
+                    <p style="text-align:center;color:var(--text-light);">Loading offline sales...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="onlineOrdersModal" class="modal" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;overflow:auto;background-color:rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color:#fefefe;margin:10% auto;padding:20px;border:none;border-radius:10px;width:90%;max-width:900px;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+            <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:2px solid var(--light-color);padding-bottom:15px;">
+                <h2 style="color:var(--primary-color);margin:0;font-size:1.8rem;">
+                    <span style="font-size:1.5rem;">🛒</span> Recent Online Orders
+                </h2>
+                <span class="close" style="color:#aaa;font-size:28px;font-weight:bold;cursor:pointer;">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="onlineOrdersList" style="max-height:500px;overflow-y:auto;">
+                    <p style="text-align:center;color:var(--text-light);">Loading online orders...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Sales Modal -->
+    <div id="manualSaleModal" class="modal" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;overflow:auto;background-color:rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color:#fefefe;margin:5% auto;padding:30px;border:none;border-radius:15px;width:90%;max-width:600px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+            <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;border-bottom:2px solid var(--light-color);padding-bottom:20px;">
+                <h2 style="color:var(--primary-color);margin:0;font-size:2rem;font-weight:700;">
+                    <span style="font-size:1.8rem;">💰</span> Manual Sales Entry
+                </h2>
+                <span class="close" onclick="closeManualSaleModal()" style="color:#aaa;font-size:32px;font-weight:bold;cursor:pointer;transition:color 0.2s ease;">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="manualSaleForm" style="display:flex;flex-direction:column;gap:20px;">
+                    <!-- Product Selection -->
+                    <div class="form-group">
+                        <label for="productVariant" style="display:block;margin-bottom:8px;font-weight:600;color:var(--primary-color);">
+                            Product Variant *
+                        </label>
+                        <select id="productVariant" name="product_variant_id" required style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:16px;transition:border-color 0.3s ease;">
+                            <option value="">-- Select Product Variant --</option>
+                        </select>
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="form-group">
+                        <label for="quantity" style="display:block;margin-bottom:8px;font-weight:600;color:var(--primary-color);">
+                            Quantity *
+                        </label>
+                        <input type="number" id="quantity" name="quantity" min="1" required style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:16px;transition:border-color 0.3s ease;">
+                    </div>
+
+                    <!-- Price -->
+                    <div class="form-group">
+                        <label for="price" style="display:block;margin-bottom:8px;font-weight:600;color:var(--primary-color);">
+                            Price per Unit (KSh) *
+                        </label>
+                        <input type="number" id="price" name="price" min="0" step="0.01" required style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:16px;transition:border-color 0.3s ease;">
+                    </div>
+
+                    <!-- Customer Name -->
+                    <div class="form-group">
+                        <label for="customerName" style="display:block;margin-bottom:8px;font-weight:600;color:var(--primary-color);">
+                            Customer Name
+                        </label>
+                        <input type="text" id="customerName" name="customer_name" placeholder="Walk-in customer" style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:16px;transition:border-color 0.3s ease;">
+                    </div>
+
+                    <!-- Payment Mode -->
+                    <div class="form-group">
+                        <label for="paymentMode" style="display:block;margin-bottom:8px;font-weight:600;color:var(--primary-color);">
+                            Payment Mode *
+                        </label>
+                        <select id="paymentMode" name="payment_mode" required style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:16px;transition:border-color 0.3s ease;">
+                            <option value="">-- Select Payment Mode --</option>
+                            <option value="Cash">Cash</option>
+                            <option value="M-Pesa">M-Pesa</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Card">Card</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Total Amount (Calculated) -->
+                    <div class="form-group">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:var(--primary-color);">
+                            Total Amount (KSh)
+                        </label>
+                        <div id="totalAmount" style="padding:12px;background-color:#f8f9fa;border:2px solid #e0e0e0;border-radius:8px;font-size:18px;font-weight:700;color:var(--primary-color);text-align:center;">
+                            KSh 0.00
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions" style="display:flex;gap:15px;margin-top:20px;">
+                        <button type="submit" style="flex:1;padding:15px;background:var(--primary-color);color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:background 0.3s ease;">
+                            💰 Create Sale
+                        </button>
+                        <button type="button" onclick="closeManualSaleModal()" style="flex:1;padding:15px;background:#6c757d;color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:background 0.3s ease;">
+                            ❌ Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/admin-dashboard.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/admin_dashboard_charts.js') }}"></script>
+
+    <!-- Manual Sales Modal JavaScript -->
+    <script>
+        // Global variables
+        let productVariants = [];
+        let selectedVariant = null;
+
+        // Open manual sale modal
+        function openManualSaleModal() {
+            document.getElementById('manualSaleModal').style.display = 'block';
+            loadProductVariants();
+            resetForm();
+        }
+
+        // Close manual sale modal
+        function closeManualSaleModal() {
+            document.getElementById('manualSaleModal').style.display = 'none';
+            resetForm();
+        }
+
+        // Reset form to initial state
+        function resetForm() {
+            document.getElementById('manualSaleForm').reset();
+            document.getElementById('totalAmount').textContent = 'KSh 0.00';
+            selectedVariant = null;
+        }
+
+        // Load product variants from API
+        async function loadProductVariants() {
+            try {
+                const response = await fetch('/api/admin/product-variants');
+                const data = await response.json();
+                
+                if (Array.isArray(data)) {
+                    productVariants = data;
+                    populateProductDropdown();
+                } else if (data.error) {
+                    console.error('Failed to load product variants:', data.error);
+                    showAlert('Error loading products. Please try again.', 'error');
+                } else {
+                    console.error('Unexpected response format:', data);
+                    showAlert('Error loading products. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading product variants:', error);
+                showAlert('Error loading products. Please try again.', 'error');
+            }
+        }
+
+        // Populate product dropdown
+        function populateProductDropdown() {
+            const select = document.getElementById('productVariant');
+            select.innerHTML = '<option value="">-- Select Product Variant --</option>';
+            
+            productVariants.forEach(variant => {
+                const option = document.createElement('option');
+                option.value = variant.id;
+                option.textContent = `${variant.product_name} - ${variant.quantity_value}${variant.quantity_unit} (Stock: ${variant.stock_level})`;
+                option.dataset.variant = JSON.stringify(variant);
+                select.appendChild(option);
+            });
+        }
+
+        // Handle product selection change
+        function onProductChange() {
+            const select = document.getElementById('productVariant');
+            const selectedOption = select.options[select.selectedIndex];
+            
+            if (selectedOption.value) {
+                selectedVariant = JSON.parse(selectedOption.dataset.variant);
+                document.getElementById('price').value = selectedVariant.selling_price;
+                calculateTotal();
+            } else {
+                selectedVariant = null;
+                document.getElementById('price').value = '';
+                calculateTotal();
+            }
+        }
+
+        // Calculate total amount
+        function calculateTotal() {
+            const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+            const price = parseFloat(document.getElementById('price').value) || 0;
+            const total = quantity * price;
+            
+            document.getElementById('totalAmount').textContent = `KSh ${total.toFixed(2)}`;
+        }
+
+        // Show alert message
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 10000;
+                max-width: 400px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease;
+            `;
+            
+            if (type === 'success') {
+                alertDiv.style.backgroundColor = '#28a745';
+            } else if (type === 'error') {
+                alertDiv.style.backgroundColor = '#dc3545';
+            } else {
+                alertDiv.style.backgroundColor = '#ffc107';
+                alertDiv.style.color = '#212529';
+            }
+            
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+            
+            // Remove alert after 5 seconds
+            setTimeout(() => {
+                alertDiv.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.parentNode.removeChild(alertDiv);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        // Handle form submission
+        document.getElementById('manualSaleForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const saleData = {
+                product_variant_id: parseInt(formData.get('product_variant_id')),
+                quantity: parseInt(formData.get('quantity')),
+                price: parseFloat(formData.get('price')),
+                customer_name: formData.get('customer_name') || 'Walk-in customer',
+                payment_mode: formData.get('payment_mode')
+            };
+
+            // Validation
+            if (!saleData.product_variant_id) {
+                showAlert('Please select a product variant.', 'error');
+                return;
+            }
+            
+            if (saleData.quantity <= 0) {
+                showAlert('Quantity must be greater than 0.', 'error');
+                return;
+            }
+            
+            if (saleData.price <= 0) {
+                showAlert('Price must be greater than 0.', 'error');
+                return;
+            }
+            
+            if (!saleData.payment_mode) {
+                showAlert('Please select a payment mode.', 'error');
+                return;
+            }
+
+            // Check stock availability
+            if (selectedVariant && saleData.quantity > selectedVariant.stock_level) {
+                showAlert(`Insufficient stock. Only ${selectedVariant.stock_level} units available.`, 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/manual-sale', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(saleData)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('Sale created successfully!', 'success');
+                    closeManualSaleModal();
+                    // Refresh dashboard data
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showAlert(result.message || 'Failed to create sale. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Error creating sale:', error);
+                showAlert('Error creating sale. Please try again.', 'error');
+            }
+        });
+
+        // Add event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Product change event
+            document.getElementById('productVariant').addEventListener('change', onProductChange);
+            
+            // Quantity and price change events for total calculation
+            document.getElementById('quantity').addEventListener('input', calculateTotal);
+            document.getElementById('price').addEventListener('input', calculateTotal);
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('manualSaleModal');
+                if (event.target === modal) {
+                    closeManualSaleModal();
+                }
+            });
+        });
+
+        // CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>

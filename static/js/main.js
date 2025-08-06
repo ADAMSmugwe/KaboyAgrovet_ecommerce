@@ -900,15 +900,36 @@ if (orderForm && orderFormMessage) {
 
                 const result = await response.json();
                 if (response.ok && result.status === 'success') {
-                    orderFormMessage.textContent = result.message || 'Thank you for your order! We will contact you soon to confirm.';
+                    orderFormMessage.innerHTML = `
+                        ${result.message || 'Thank you for your order! We will contact you soon to confirm.'}
+                        <br><br>
+                        <div style="margin-bottom: 10px; font-size: 12px; color: #666;">
+                            Redirecting to home page in <span id="orderCountdown">3</span> seconds...
+                        </div>
+                        <button onclick="closeOrderModalAndExit()" style="background: var(--primary-color); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                            Continue Shopping Now
+                        </button>
+                    `;
                     orderFormMessage.classList.remove('error');
                     orderFormMessage.classList.add('success');
                     orderForm.reset();
+                    
+                    // Countdown and auto-close modal after 3 seconds
+                    let countdown = 3;
+                    const countdownElement = document.getElementById('orderCountdown');
+                    const countdownInterval = setInterval(() => {
+                        countdown--;
+                        if (countdownElement) {
+                            countdownElement.textContent = countdown;
+                        }
+                        if (countdown <= 0) {
+                            clearInterval(countdownInterval);
+                            closeOrderModalAndExit();
+                        }
+                    }, 1000);
                     clearFieldError('orderName');
                     clearFieldError('orderPhone');
                     clearFieldError('orderQuantity');
-                    orderModal.classList.remove('active');
-                    document.body.style.overflow = '';
                     if (currentActiveProductBtn) currentActiveProductBtn.classList.remove('active-modal-button');
                 } else {
                     orderFormMessage.textContent = result.message || 'There was an error submitting your order. Please try again.';
@@ -976,6 +997,22 @@ if (orderForm && orderFormMessage) {
             }, 3000); // Shorter timeout for feedback
         }
     });
+}
+
+// Exit functions for order confirmation
+function closeOrderModalAndExit() {
+    const orderModal = document.getElementById('orderModal');
+    if (orderModal) {
+        orderModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    // Redirect to home page
+    window.location.href = '/';
+}
+
+function closeCartAndExit() {
+    // Redirect to home page
+    window.location.href = '/';
 }
 
 // Order Modal Close Logic
@@ -1262,9 +1299,32 @@ if (checkoutForm && checkoutFormMessage) {
             const result = await response.json();
 
             if (response.ok && result.status === 'success') {
-                checkoutFormMessage.textContent = result.message || 'Order placed successfully!';
+                checkoutFormMessage.innerHTML = `
+                    ${result.message || 'Order placed successfully!'}
+                    <br><br>
+                    <div style="margin-bottom: 10px; font-size: 12px; color: #666;">
+                        Redirecting to home page in <span id="cartCountdown">3</span> seconds...
+                    </div>
+                    <button onclick="closeCartAndExit()" style="background: var(--primary-color); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                        Continue Shopping Now
+                    </button>
+                `;
                 checkoutFormMessage.classList.remove('error');
                 checkoutFormMessage.classList.add('success');
+                
+                // Countdown and auto-close cart after 3 seconds
+                let countdown = 3;
+                const countdownElement = document.getElementById('cartCountdown');
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    if (countdownElement) {
+                        countdownElement.textContent = countdown;
+                    }
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        closeCartAndExit();
+                    }
+                }, 1000);
 
                 saveCart([]); // Clear cart from local storage after successful submission
                 checkoutForm.reset();
