@@ -774,18 +774,45 @@ class ProductAdminView(MyAdminModelView):
     column_formatters = {
         'variants_count': lambda v, c, m, p: len(m.variants) if m.variants else 0
     }
-    
+
+    # Clean fix: Use form_overrides to force SelectField for category
+    form_overrides = {
+        'category': SelectField
+    }
+
     form_choices = {
         'category': [
-            ('Fertilizer', 'Fertilizer', False, {}),
-            ('Pesticide', 'Pesticide', False, {}),
-            ('Seed', 'Seed', False, {}),
-            ('Feed', 'Feed', False, {}),
-            ('Other', 'Other', False, {})
+            ('Fertilizer', 'Fertilizer'),
+            ('Pesticide', 'Pesticide'),
+            ('Seed', 'Seed'),
+            ('Feed', 'Feed'),
+            ('Other', 'Other')
         ]
     }
 
 # Simple ModelView classes - removed complex custom views
+
+class ProductVariantForm(FlaskForm):
+    """Custom form for ProductVariant to avoid Select2Widget issues"""
+    product = SelectField('Product', coerce=int, validators=[DataRequired()])
+    quantity_value = FloatField('Quantity Value', validators=[DataRequired()])
+    quantity_unit = SelectField('Unit', choices=[
+        ('kg', 'Kilograms (kg)'),
+        ('g', 'Grams (g)'),
+        ('l', 'Liters (l)'),
+        ('ml', 'Milliliters (ml)'),
+        ('pcs', 'Pieces (pcs)'),
+        ('bags', 'Bags'),
+        ('bottles', 'Bottles'),
+        ('cans', 'Cans'),
+        ('packets', 'Packets'),
+        ('boxes', 'Boxes')
+    ], validators=[DataRequired()])
+    selling_price = FloatField('Selling Price', validators=[DataRequired()])
+    buying_price = FloatField('Buying Price')
+    stock_level = IntegerField('Stock Level', validators=[DataRequired()])
+    expiry_date = DateTimeField('Expiry Date', format='%Y-%m-%d')
+    supplier = StringField('Supplier')
 
 class ProductVariantAdminView(MyAdminModelView):
     column_list = ['product', 'quantity_value', 'quantity_unit', 'selling_price', 'buying_price', 'stock_level', 'expiry_date', 'supplier']
@@ -804,45 +831,46 @@ class ProductVariantAdminView(MyAdminModelView):
     column_filters = ['stock_level', 'expiry_date', 'supplier']
     create_modal = False
     edit_modal = False
-
-    form_args = {
-        'quantity_value': {'validators': [DataRequired()]},
-        'selling_price': {'validators': [DataRequired()]},
-        'buying_price': {'validators': [DataRequired()]},
-        'stock_level': {'validators': [DataRequired()]}
+    
+        # Fix: Use form_overrides to properly configure the product field
+    form_overrides = {
+        'product': SelectField
     }
 
-    form_choices = {
-        'quantity_unit': [
-            ('kg', 'Kilograms (kg)'),
-            ('g', 'Grams (g)'),
-            ('l', 'Liters (l)'),
-            ('ml', 'Milliliters (ml)'),
-            ('pcs', 'Pieces (pcs)'),
-            ('bags', 'Bags'),
-            ('bottles', 'Bottles'),
-            ('cans', 'Cans'),
-            ('packets', 'Packets'),
-            ('boxes', 'Boxes')
-        ]
-    }
+    def get_create_form(self):
+        """Override to populate product choices dynamically"""
+        form_class = super().get_create_form()
 
-    def scaffold_form(self):
-        form_class = super(ProductVariantAdminView, self).scaffold_form()
-        
-        # Use a coerce function to handle the product field properly
-        from wtforms_sqlalchemy.fields import QuerySelectField
-        
-        def get_product_query():
-            return Product.query
-        
-        form_class.product = QuerySelectField(
-            'Product',
-            query_factory=get_product_query,
-            get_label='name',
-            allow_blank=True,
-            blank_text='-- Select Product --'
-        )
+        # Populate product choices when the form is actually used
+        try:
+            products = Product.query.order_by(Product.name).all()
+            product_choices = [(p.id, p.name) for p in products]
+            formatted_choices = []
+            for choice in product_choices:
+                formatted_choices.append((choice[0], choice[1], False, {}))
+            form_class.product.choices = formatted_choices
+        except:
+            # Fallback if database is not available
+            form_class.product.choices = []
+
+        return form_class
+
+    def get_edit_form(self):
+        """Override to populate product choices dynamically"""
+        form_class = super().get_edit_form()
+
+        # Populate product choices when the form is actually used
+        try:
+            products = Product.query.order_by(Product.name).all()
+            product_choices = [(p.id, p.name) for p in products]
+            formatted_choices = []
+            for choice in product_choices:
+                formatted_choices.append((choice[0], choice[1], False, {}))
+            form_class.product.choices = formatted_choices
+        except:
+            # Fallback if database is not available
+            form_class.product.choices = []
+
         return form_class
 
 class OrderAdminView(MyAdminModelView):
@@ -887,12 +915,17 @@ class OrderAdminView(MyAdminModelView):
         }
     }
     
+    # Fix: Use form_overrides to properly configure the payment_status field
+    form_overrides = {
+        'payment_status': SelectField
+    }
+
     form_choices = {
         'payment_status': [
-            ('Pending', 'Pending', False, {}),
-            ('Paid', 'Paid', False, {}),
-            ('Cancelled', 'Cancelled', False, {}),
-            ('Refunded', 'Refunded', False, {})
+            ('Pending', 'Pending'),
+            ('Paid', 'Paid'),
+            ('Cancelled', 'Cancelled'),
+            ('Refunded', 'Refunded')
         ]
     }
 
@@ -955,13 +988,18 @@ class OfflineSaleAdminView(MyAdminModelView):
         }
     }
     
+    # Fix: Use form_overrides to properly configure the payment_mode field
+    form_overrides = {
+        'payment_mode': SelectField
+    }
+
     form_choices = {
         'payment_mode': [
-            ('Cash', 'Cash', False, {}),
-            ('M-Pesa', 'M-Pesa', False, {}),
-            ('Bank Transfer', 'Bank Transfer', False, {}),
-            ('Card', 'Card', False, {}),
-            ('Other', 'Other', False, {})
+            ('Cash', 'Cash'),
+            ('M-Pesa', 'M-Pesa'),
+            ('Bank Transfer', 'Bank Transfer'),
+            ('Card', 'Card'),
+            ('Other', 'Other')
         ]
     }
 
