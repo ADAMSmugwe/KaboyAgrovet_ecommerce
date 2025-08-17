@@ -3,235 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send Marketing Email - Kaboy Agrovet Admin</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Send Marketing Email - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .marketing-container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 30px;
-            background: white;
-            border-radius: 10px;
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #4a8f29;
-        }
-        .form-group textarea {
-            min-height: 200px;
-            resize: vertical;
-        }
-        .submit-btn {
-            background: #4a8f29;
+        .card-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
             color: white;
+            border-radius: 15px 15px 0 0 !important;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
             border: none;
-            padding: 14px 30px;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 25px;
+            padding: 12px 30px;
             font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s ease;
         }
-        .submit-btn:hover {
-            background: #3a7a1f;
-        }
-        .submit-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-        }
-        .stats {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-        .stats h3 {
-            color: #4a8f29;
-            margin-bottom: 15px;
-        }
-        .alert {
-            padding: 12px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .preview-section {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        .preview-btn {
-            background: #007bff;
-            color: white;
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
             border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 10px;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
         }
-        .preview-btn:hover {
-            background: #0056b3;
+        .stats-card {
+            background: linear-gradient(135deg, #6f42c1, #e83e8c);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="marketing-container">
-        <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #4a8f29; margin: 0;">📧 Marketing Email Campaign</h1>
-            <p style="color: #666; margin: 5px 0;">Send promotional emails to your subscribers</p>
-        </div>
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <div class="stats">
-            <h3>📊 Campaign Statistics</h3>
-            <p><strong>Active Subscribers:</strong> {{ subscriber_count }}</p>
-            <p><strong>Ready to Send:</strong> {% if subscriber_count > 0 %}Yes{% else %}No{% endif %}</p>
-        </div>
-
-        <form method="POST">
-            <div class="form-group">
-                <label for="campaign_type">Campaign Type:</label>
-                <select id="campaign_type" name="campaign_type" required>
-                    <option value="newsletter">Newsletter</option>
-                    <option value="promotion">Promotion</option>
-                    <option value="announcement">Announcement</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="subject">Email Subject:</label>
-                <input type="text" id="subject" name="subject" required 
-                       placeholder="Enter email subject line">
-            </div>
-
-            <div class="form-group">
-                <label for="content">Email Content (HTML):</label>
-                <textarea id="content" name="content" required 
-                          placeholder="Enter your email content here. You can use HTML formatting."></textarea>
-                <small style="color: #666;">You can use HTML tags like &lt;h1&gt;, &lt;p&gt;, &lt;strong&gt;, &lt;em&gt;, etc.</small>
-            </div>
-
-            <div class="preview-section">
-                <h4>Preview & Test</h4>
-                <button type="button" class="preview-btn" onclick="previewEmail()">Preview Email</button>
-                <button type="button" class="preview-btn" onclick="showTemplate()">Show Template</button>
-            </div>
-
-            <button type="submit" class="submit-btn" {% if subscriber_count == 0 %}disabled{% endif %}>
-                {% if subscriber_count > 0 %}
-                    Send to {{ subscriber_count }} Subscribers
-                {% else %}
-                    No Active Subscribers
-                {% endif %}
-            </button>
-        </form>
-
-        <div style="margin-top: 30px; text-align: center;">
-            <a href="{{ url_for('admin_dashboard') }}" style="color: #4a8f29; text-decoration: none;">
-                ← Back to Dashboard
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/admin-dashboard">
+                <i class="fas fa-tachometer-alt"></i> Kaboy Agrovet Admin
             </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/admin-dashboard">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a class="nav-link" href="/admin-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Stats Card -->
+        <div class="stats-card">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4><i class="fas fa-users"></i> Active Subscribers</h4>
+                    <h2>{{ subscriber_count }}</h2>
+                </div>
+                <div class="col-md-6 text-end">
+                    <h4><i class="fas fa-envelope"></i> Marketing Campaigns</h4>
+                    <p>Send promotional emails to your subscribers</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marketing Email Form -->
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-paper-plane"></i> Send Marketing Email</h4>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Email Subject *</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="campaign_type" class="form-label">Campaign Type</label>
+                        <select class="form-select" id="campaign_type" name="campaign_type">
+                            <option value="newsletter">Newsletter</option>
+                            <option value="promotion">Promotion</option>
+                            <option value="announcement">Announcement</option>
+                            <option value="product_update">Product Update</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Email Content *</label>
+                        <textarea class="form-control" id="content" name="content" rows="10" required 
+                                  placeholder="Enter your email content here. You can use HTML formatting."></textarea>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> You can use HTML tags for formatting. 
+                            The content will be wrapped in our email template.
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/admin-dashboard" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane"></i> Send Email Campaign
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Email Tips -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="fas fa-lightbulb"></i> Email Marketing Tips</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-check-circle text-success"></i> Best Practices:</h6>
+                        <ul>
+                            <li>Keep subject lines clear and engaging</li>
+                            <li>Use personalization when possible</li>
+                            <li>Include clear call-to-actions</li>
+                            <li>Test your emails before sending</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-exclamation-triangle text-warning"></i> Avoid:</h6>
+                        <ul>
+                            <li>Spam trigger words</li>
+                            <li>All caps text</li>
+                            <li>Too many images</li>
+                            <li>Overly promotional language</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script>
-        function previewEmail() {
-            const subject = document.getElementById('subject').value;
-            const content = document.getElementById('content').value;
-            
-            if (!subject || !content) {
-                alert('Please fill in both subject and content before previewing.');
-                return;
-            }
-            
-            // Create a new window with the email preview
-            const previewWindow = window.open('', '_blank', 'width=800,height=600');
-            previewWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Email Preview - ${subject}</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; }
-                        .preview-header { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="preview-header">
-                        <h3>Email Preview</h3>
-                        <p><strong>Subject:</strong> ${subject}</p>
-                        <p><strong>Recipients:</strong> ${document.querySelector('.stats p').textContent.split(':')[1].trim()}</p>
-                    </div>
-                    <div style="border: 1px solid #ddd; padding: 20px; border-radius: 5px;">
-                        ${content}
-                    </div>
-                </body>
-                </html>
-            `);
-        }
-
-        function showTemplate() {
-            const template = `
-<h2>🎉 Special Offer!</h2>
-
-<p>Dear Valued Customer,</p>
-
-<p>We're excited to bring you our latest special offers on agricultural products!</p>
-
-<h3>🔥 This Week's Deals:</h3>
-<ul>
-    <li><strong>Mavuno Fertilizer:</strong> 20% off on 50KG bags</li>
-    <li><strong>Pesticides:</strong> Buy 2, Get 1 Free</li>
-    <li><strong>Seeds:</strong> 15% discount on all seed varieties</li>
-</ul>
-
-<p><strong>Offer valid until:</strong> End of this month</p>
-
-<p>Visit our store today to take advantage of these amazing deals!</p>
-
-<p>Best regards,<br>
-<strong>Kaboy Agrovet Team</strong></p>
-            `;
-            
-            document.getElementById('content').value = template;
-            alert('Template loaded! You can now customize it.');
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 

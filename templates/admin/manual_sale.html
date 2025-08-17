@@ -2,137 +2,193 @@
 
 {% block body %}
 <div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="page-header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <i class="fa fa-shopping-cart"></i>
+                    </div>
+                    <div class="header-text">
+                        <h1>Manual Sales</h1>
+                        <p>Record offline sales and manage transactions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
-        <div class="col-md-12">
-            <div class="card">
+        <!-- Left Column - Customer & Product Selection -->
+        <div class="col-lg-8">
+            <!-- Customer Information Card -->
+            <div class="card mb-4">
                 <div class="card-header">
-                    <h3 class="card-title">🌱 Manual Sales - Kaboy Agrovet</h3>
-                    <p class="card-subtitle">Record offline sales with multiple items</p>
+                    <div class="card-header-content">
+                        <i class="fa fa-user-circle"></i>
+                        <h5>Customer Information</h5>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <form id="manualSaleForm">
-                        <!-- Customer Information -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="customerName">Customer Name (Optional)</label>
-                                    <input type="text" class="form-control" id="customerName" placeholder="Walk-in customer">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="paymentMode">Payment Mode</label>
-                                    <select class="form-control" id="paymentMode" required>
-                                        <option value="">Select Payment Mode</option>
-                                        <option value="Cash">Cash</option>
-                                        <option value="M-Pesa">M-Pesa</option>
-                                        <option value="Bank Transfer">Bank Transfer</option>
-                                        <option value="Card">Card</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="customerName">
+                                    <i class="fa fa-user"></i> Customer Name
+                                </label>
+                                <input type="text" class="form-control modern-input" id="customerName" 
+                                       placeholder="Walk-in customer (optional)">
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="paymentMode">
+                                    <i class="fa fa-credit-card"></i> Payment Method
+                                </label>
+                                <select class="form-control modern-select" id="paymentMode" required>
+                                    <option value="">Choose payment method</option>
+                                    <option value="Cash">💵 Cash</option>
+                                    <option value="M-Pesa">📱 M-Pesa</option>
+                                    <option value="Bank Transfer">🏦 Bank Transfer</option>
+                                    <option value="Card">💳 Card</option>
+                                    <option value="Other">🔧 Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                        <!-- Product Search and Selection -->
-                        <div class="row mb-4">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="productSearch">Search Product Variants</label>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="productSearch" placeholder="Search by product name, unit, or supplier...">
-                                        <button type="button" class="btn btn-primary" onclick="searchProducts()">
-                                            <i class="fa fa-search"></i> Search
-                                        </button>
-                                    </div>
-                                </div>
+            <!-- Product Search Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="card-header-content">
+                        <i class="fa fa-search"></i>
+                        <h5>Product Search</h5>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="search-container">
+                        <div class="input-group">
+                            <input type="text" class="form-control modern-input search-input" 
+                                   id="productSearch" placeholder="Search products by name, unit, or supplier...">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-primary search-btn" onclick="searchProducts()">
+                                    <i class="fa fa-search"></i>
+                                </button>
                             </div>
                         </div>
+                        <small class="text-muted">
+                            <i class="fa fa-info-circle"></i> Type product name and press Enter or click Search
+                        </small>
+                    </div>
+                </div>
+            </div>
 
-                        <!-- Search Results -->
-                        <div class="row mb-4" id="searchResults" style="display: none;">
-                            <div class="col-md-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>Available Products</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="productsList" class="row">
-                                            <!-- Products will be loaded here -->
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <!-- Search Results Card -->
+            <div class="card mb-4" id="searchResults" style="display: none;">
+                <div class="card-header">
+                    <div class="card-header-content">
+                        <i class="fa fa-list"></i>
+                        <h5>Available Products</h5>
+                        <span class="badge badge-primary" id="resultsCount">0</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="productsList" class="products-grid">
+                        <!-- Products will be loaded here -->
+                    </div>
+                </div>
+            </div>
 
-                        <!-- Selected Items -->
-                        <div class="row mb-4">
-                            <div class="col-md-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>Selected Items</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="selectedItems">
-                                            <p class="text-muted">No items selected yet. Search and select products above.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+            <!-- Selected Items Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="card-header-content">
+                        <i class="fa fa-shopping-basket"></i>
+                        <h5>Selected Items</h5>
+                        <span class="badge badge-success" id="itemsCount">0</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="selectedItems">
+                        <div class="empty-state">
+                            <i class="fa fa-shopping-basket"></i>
+                            <p>No items selected yet</p>
+                            <small>Search and select products above to get started</small>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <!-- Totals and Payment -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>Sale Summary</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <strong>Total Cost:</strong>
-                                            </div>
-                                            <div class="col-6">
-                                                <span id="totalCost">KSh 0.00</span>
-                                            </div>
-                                        </div>
-                                        <div class="row mt-2">
-                                            <div class="col-6">
-                                                <strong>Amount Paid:</strong>
-                                            </div>
-                                            <div class="col-6">
-                                                <input type="number" class="form-control" id="amountPaid" placeholder="0.00" step="0.01" onchange="calculateChange()">
-                                            </div>
-                                        </div>
-                                        <div class="row mt-2">
-                                            <div class="col-6">
-                                                <strong>Change Given:</strong>
-                                            </div>
-                                            <div class="col-6">
-                                                <span id="changeGiven">KSh 0.00</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>Actions</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <button type="button" class="btn btn-success btn-lg btn-block mb-2" onclick="submitSale()">
-                                            <i class="fa fa-check"></i> Complete Sale
-                                        </button>
-                                        <button type="button" class="btn btn-secondary btn-block" onclick="clearForm()">
-                                            <i class="fa fa-refresh"></i> Clear Form
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+        <!-- Right Column - Summary & Actions -->
+        <div class="col-lg-4">
+            <!-- Sale Summary Card -->
+            <div class="card mb-4 sticky-summary">
+                <div class="card-header">
+                    <div class="card-header-content">
+                        <i class="fa fa-calculator"></i>
+                        <h5>Sale Summary</h5>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="summary-item">
+                        <div class="summary-label">
+                            <i class="fa fa-tags"></i> Total Cost
                         </div>
-                    </form>
+                        <div class="summary-value" id="totalCost">KSh 0.00</div>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <div class="summary-label">
+                            <i class="fa fa-money"></i> Amount Paid
+                        </div>
+                        <div class="summary-input">
+                            <input type="number" class="form-control modern-input" id="amountPaid" 
+                                   placeholder="0.00" step="0.01" onchange="calculateChange()">
+                        </div>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <div class="summary-label">
+                            <i class="fa fa-exchange"></i> Change Given
+                        </div>
+                        <div class="summary-value" id="changeGiven">KSh 0.00</div>
+                    </div>
+
+                    <hr class="summary-divider">
+                    
+                    <div class="summary-item total-row">
+                        <div class="summary-label">
+                            <i class="fa fa-check-circle"></i> Status
+                        </div>
+                        <div class="summary-value">
+                            <span class="badge badge-warning" id="saleStatus">Pending</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-header-content">
+                        <i class="fa fa-cogs"></i>
+                        <h5>Actions</h5>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <button type="button" class="btn btn-success btn-lg btn-block action-btn" onclick="submitSale()">
+                        <i class="fa fa-check"></i> Complete Sale
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-block action-btn" onclick="clearForm()">
+                        <i class="fa fa-refresh"></i> Clear Form
+                    </button>
+                    <button type="button" class="btn btn-info btn-block action-btn" onclick="printReceipt()">
+                        <i class="fa fa-print"></i> Print Receipt
+                    </button>
                 </div>
             </div>
         </div>
@@ -140,53 +196,612 @@
 </div>
 
 <style>
+/* Modern Card Styling */
 .card {
     border: none;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    border-radius: 20px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 1.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card:hover {
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    transform: translateY(-8px) scale(1.02);
 }
 
 .card-header {
-    background: linear-gradient(135deg, #4a8f29 0%, #3a7a1f 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
     color: white;
-    border-radius: 10px 10px 0 0 !important;
+    border-radius: 20px 20px 0 0 !important;
+    padding: 1.5rem 2rem;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.card:hover .card-header::before {
+    transform: translateX(100%);
+}
+
+.card-header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.card-header-content i {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.card-header-content h5 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.badge {
+    padding: 0.5rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Page Header */
+.page-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    border-radius: 25px;
+    padding: 3rem 2rem;
+    color: white;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+}
+
+.page-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: float 6s ease-in-out infinite;
+}
+
+.page-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-icon {
+    font-size: 3rem;
+    opacity: 0.9;
+}
+
+.header-text h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.header-text p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+/* Form Controls */
+.modern-input, .modern-select {
+    border: 2px solid #e1e8ed;
+    border-radius: 16px;
+    padding: 16px 20px;
+    font-size: 1rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, #fafbfc 0%, #f1f5f9 100%);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.modern-input:focus, .modern-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), inset 0 2px 4px rgba(0,0,0,0.05);
+    background: white;
+    transform: translateY(-2px);
+}
+
+.modern-input:hover, .modern-select:hover {
+    border-color: #667eea;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Search Container */
+.search-container {
+    position: relative;
+}
+
+.search-input {
+    border-radius: 12px 0 0 12px;
+    border-right: none;
+}
+
+.search-btn {
+    border-radius: 0 16px 16px 0;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    border: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+}
+
+.search-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s ease;
+}
+
+.search-btn:hover::before {
+    left: 100%;
+}
+
+.search-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+}
+
+/* Products Grid */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
 }
 
 .product-item {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 10px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 2px solid #e1e8ed;
+    border-radius: 20px;
+    padding: 2rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.product-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    transform: scaleX(0);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(102, 126, 234, 0.02) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
 }
 
 .product-item:hover {
-    border-color: #4a8f29;
-    box-shadow: 0 2px 8px rgba(74, 143, 41, 0.2);
+    border-color: #667eea;
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
+    transform: translateY(-8px) scale(1.02);
+}
+
+.product-item:hover::before {
+    transform: scaleX(1);
+}
+
+.product-item:hover::after {
+    opacity: 1;
 }
 
 .product-item.selected {
-    border-color: #4a8f29;
-    background-color: #f8fff8;
+    border-color: #667eea;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.25);
+    transform: translateY(-4px) scale(1.01);
 }
 
+.product-item.selected::before {
+    transform: scaleX(1);
+}
+
+.product-item h6 {
+    color: #2d3748;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.product-item .price {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #667eea;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.product-item .stock {
+    color: #718096;
+    font-size: 0.95rem;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.product-item .stock i {
+    color: #48bb78;
+}
+
+.product-item h6 {
+    color: #2d3748;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.product-item .price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.product-item .stock {
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+/* Selected Items */
 .selected-item {
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    border: 2px solid #e1e8ed;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.selected-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+}
+
+.selected-item .item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.selected-item .item-title {
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+}
+
+.selected-item .item-subtitle {
+    color: #718096;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.selected-item .item-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1rem;
+    align-items: end;
+}
+
+.selected-item .control-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+
+.selected-item .control-group input {
     border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 10px;
+    border: 2px solid #e1e8ed;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+
+.selected-item .item-total {
+    text-align: center;
+    padding: 0.5rem;
+    background: #667eea;
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.remove-btn {
+    background: #e53e3e;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.remove-btn:hover {
+    background: #c53030;
+    transform: scale(1.05);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #718096;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state small {
+    font-size: 0.9rem;
+}
+
+/* Summary Styling */
+.sticky-summary {
+    position: sticky;
+    top: 2rem;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(241, 245, 249, 0.8) 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(226, 232, 240, 0.5);
+    transition: all 0.3s ease;
+}
+
+.summary-item:hover {
+    background: linear-gradient(135deg, rgba(248, 250, 252, 1) 0%, rgba(241, 245, 249, 1) 100%);
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.summary-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.summary-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.summary-input {
+    flex: 1;
+    max-width: 150px;
+}
+
+.summary-divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e1e8ed, transparent);
+    margin: 1.5rem 0;
+}
+
+.total-row {
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 0 -0.5rem;
+}
+
+/* Action Buttons */
+.action-btn {
+    border-radius: 16px;
+    padding: 16px 24px;
+    font-weight: 700;
+    border: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.action-btn:hover::before {
+    left: 100%;
 }
 
 .btn-success {
-    background: linear-gradient(135deg, #4a8f29 0%, #3a7a1f 100%);
-    border: none;
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 50%, #2f855a 100%);
+    box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);
 }
 
 .btn-success:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(74, 143, 41, 0.3);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 20px 60px rgba(72, 187, 120, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #718096 0%, #4a5568 50%, #2d3748 100%);
+    box-shadow: 0 8px 25px rgba(113, 128, 150, 0.3);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 20px 60px rgba(113, 128, 150, 0.4);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 50%, #2c5282 100%);
+    box-shadow: 0 8px 25px rgba(66, 153, 225, 0.3);
+}
+
+.btn-info:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 20px 60px rgba(66, 153, 225, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header-text h1 {
+        font-size: 2rem;
+    }
+    
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .selected-item .item-controls {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .sticky-summary {
+        position: static;
+    }
+}
+
+/* Loading Animation */
+.loading-spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(102, 126, 234, 0.2);
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.1); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Success Animation */
+.success-checkmark {
+    color: #48bb78;
+    animation: bounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0) scale(1); }
+    40% { transform: translateY(-15px) scale(1.1); }
+    60% { transform: translateY(-8px) scale(1.05); }
+}
+
+/* Pulse Animation for Notifications */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.notification-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Success Animation */
+.success-checkmark {
+    color: #48bb78;
+    animation: bounce 0.6s ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
 }
 </style>
 
@@ -198,56 +813,77 @@ function searchProducts() {
     const searchTerm = document.getElementById('productSearch').value;
     const resultsDiv = document.getElementById('searchResults');
     const productsList = document.getElementById('productsList');
+    const resultsCount = document.getElementById('resultsCount');
     
     if (!searchTerm.trim()) {
-        alert('Please enter a search term');
+        showNotification('Please enter a search term', 'warning');
         return;
     }
     
     // Show loading
-    productsList.innerHTML = '<div class="col-12 text-center"><i class="fa fa-spinner fa-spin"></i> Searching...</div>';
+    productsList.innerHTML = `
+        <div class="col-12 text-center" style="grid-column: 1 / -1;">
+            <div class="loading-spinner"></div>
+            <p class="mt-2">Searching products...</p>
+        </div>
+    `;
     resultsDiv.style.display = 'block';
     
     fetch(`/api/product-variants?search=${encodeURIComponent(searchTerm)}`)
         .then(response => response.json())
         .then(data => {
+            resultsCount.textContent = data.length;
+            
             if (data.length === 0) {
-                productsList.innerHTML = '<div class="col-12 text-center text-muted">No products found</div>';
+                productsList.innerHTML = `
+                    <div class="col-12 text-center" style="grid-column: 1 / -1;">
+                        <i class="fa fa-search" style="font-size: 2rem; opacity: 0.5;"></i>
+                        <p class="mt-2">No products found</p>
+                        <small>Try a different search term</small>
+                    </div>
+                `;
                 return;
             }
             
             productsList.innerHTML = '';
             data.forEach(variant => {
                 const productDiv = document.createElement('div');
-                productDiv.className = 'col-md-6 col-lg-4 mb-3';
+                productDiv.className = 'product-item';
+                productDiv.onclick = () => selectProduct(variant);
                 productDiv.innerHTML = `
-                    <div class="product-item" onclick="selectProduct(${JSON.stringify(variant).replace(/"/g, '&quot;')})">
-                        <h6 class="mb-1">${variant.product_name}</h6>
-                        <p class="mb-1 text-muted">${variant.quantity_value} ${variant.quantity_unit}</p>
-                        <p class="mb-1"><strong>Price: KSh ${variant.selling_price}</strong></p>
-                        <p class="mb-0 text-info">Stock: ${variant.stock_level}</p>
-                    </div>
+                    <h6 class="mb-2">${variant.product_name}</h6>
+                    <p class="mb-2 text-muted">${variant.quantity_value} ${variant.quantity_unit}</p>
+                    <p class="mb-2 price">KSh ${variant.selling_price.toFixed(2)}</p>
+                    <p class="mb-0 stock">
+                        <i class="fa fa-cubes"></i> Stock: ${variant.stock_level}
+                    </p>
                 `;
                 productsList.appendChild(productDiv);
             });
         })
         .catch(error => {
             console.error('Error searching products:', error);
-            productsList.innerHTML = '<div class="col-12 text-center text-danger">Error loading products</div>';
+            productsList.innerHTML = `
+                <div class="col-12 text-center" style="grid-column: 1 / -1;">
+                    <i class="fa fa-exclamation-triangle text-danger" style="font-size: 2rem;"></i>
+                    <p class="mt-2 text-danger">Error loading products</p>
+                    <small>Please try again</small>
+                </div>
+            `;
         });
 }
 
 function selectProduct(variant) {
     // Check if already selected
-    const existingIndex = selectedItems.findIndex(item => item.variant_id === variant.id);
+    const existingIndex = selectedItems.findIndex(item => item.product_variant_id === variant.id);
     if (existingIndex !== -1) {
-        alert('This product is already in your cart');
+        showNotification('This product is already in your cart', 'info');
         return;
     }
     
     // Add to selected items
     const item = {
-        variant_id: variant.id,
+        product_variant_id: variant.id,
         product_name: variant.product_name,
         quantity_value: variant.quantity_value,
         quantity_unit: variant.quantity_unit,
@@ -260,13 +896,30 @@ function selectProduct(variant) {
     selectedItems.push(item);
     updateSelectedItemsDisplay();
     updateTotalCost();
+    updateSaleStatus();
+    
+    // Highlight the selected product
+    const productItems = document.querySelectorAll('.product-item');
+    productItems.forEach(item => item.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    
+    showNotification('Product added to cart', 'success');
 }
 
 function updateSelectedItemsDisplay() {
     const selectedItemsDiv = document.getElementById('selectedItems');
+    const itemsCount = document.getElementById('itemsCount');
+    
+    itemsCount.textContent = selectedItems.length;
     
     if (selectedItems.length === 0) {
-        selectedItemsDiv.innerHTML = '<p class="text-muted">No items selected yet. Search and select products above.</p>';
+        selectedItemsDiv.innerHTML = `
+            <div class="empty-state">
+                <i class="fa fa-shopping-basket"></i>
+                <p>No items selected yet</p>
+                <small>Search and select products above to get started</small>
+            </div>
+        `;
         return;
     }
     
@@ -275,31 +928,30 @@ function updateSelectedItemsDisplay() {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'selected-item';
         itemDiv.innerHTML = `
-            <div class="row align-items-center">
-                <div class="col-md-4">
-                    <h6 class="mb-1">${item.product_name}</h6>
-                    <small class="text-muted">${item.quantity_value} ${item.quantity_unit}</small>
+            <div class="item-header">
+                <div>
+                    <h6 class="item-title">${item.product_name}</h6>
+                    <p class="item-subtitle">${item.quantity_value} ${item.quantity_unit}</p>
                 </div>
-                <div class="col-md-2">
-                    <label>Quantity:</label>
-                    <input type="number" class="form-control form-control-sm" 
+                <button type="button" class="remove-btn" onclick="removeItem(${index})">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+            <div class="item-controls">
+                <div class="control-group">
+                    <label>Quantity</label>
+                    <input type="number" class="form-control" 
                            value="${item.quantity}" min="1" max="${item.stock_level}"
                            onchange="updateItemQuantity(${index}, this.value)">
                 </div>
-                <div class="col-md-2">
-                    <label>Price:</label>
-                    <input type="number" class="form-control form-control-sm" 
+                <div class="control-group">
+                    <label>Price (KSh)</label>
+                    <input type="number" class="form-control" 
                            value="${item.price}" step="0.01"
                            onchange="updateItemPrice(${index}, this.value)">
                 </div>
-                <div class="col-md-2">
-                    <label>Total:</label>
-                    <p class="mb-0"><strong>KSh ${(item.quantity * item.price).toFixed(2)}</strong></p>
-                </div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="removeItem(${index})">
-                        <i class="fa fa-trash"></i> Remove
-                    </button>
+                <div class="item-total">
+                    KSh ${(item.quantity * item.price).toFixed(2)}
                 </div>
             </div>
         `;
@@ -312,13 +964,14 @@ function updateItemQuantity(index, quantity) {
     if (quantity < 1) quantity = 1;
     if (quantity > selectedItems[index].stock_level) {
         quantity = selectedItems[index].stock_level;
-        alert('Quantity cannot exceed available stock');
+        showNotification('Quantity cannot exceed available stock', 'warning');
     }
     
     selectedItems[index].quantity = quantity;
     selectedItems[index].price = selectedItems[index].selling_price * quantity;
     updateSelectedItemsDisplay();
     updateTotalCost();
+    updateSaleStatus();
 }
 
 function updateItemPrice(index, price) {
@@ -327,12 +980,15 @@ function updateItemPrice(index, price) {
     selectedItems[index].price = price;
     updateSelectedItemsDisplay();
     updateTotalCost();
+    updateSaleStatus();
 }
 
 function removeItem(index) {
     selectedItems.splice(index, 1);
     updateSelectedItemsDisplay();
     updateTotalCost();
+    updateSaleStatus();
+    showNotification('Item removed from cart', 'info');
 }
 
 function updateTotalCost() {
@@ -345,11 +1001,28 @@ function calculateChange() {
     const amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
     const change = amountPaid - totalCost;
     document.getElementById('changeGiven').textContent = `KSh ${Math.max(0, change).toFixed(2)}`;
+    updateSaleStatus();
+}
+
+function updateSaleStatus() {
+    const amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
+    const statusBadge = document.getElementById('saleStatus');
+    
+    if (selectedItems.length === 0) {
+        statusBadge.textContent = 'No Items';
+        statusBadge.className = 'badge badge-secondary';
+    } else if (amountPaid >= totalCost) {
+        statusBadge.textContent = 'Ready';
+        statusBadge.className = 'badge badge-success';
+    } else {
+        statusBadge.textContent = 'Pending';
+        statusBadge.className = 'badge badge-warning';
+    }
 }
 
 function submitSale() {
     if (selectedItems.length === 0) {
-        alert('Please add at least one item to the sale');
+        showNotification('Please add at least one item to the sale', 'warning');
         return;
     }
     
@@ -358,12 +1031,12 @@ function submitSale() {
     const amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
     
     if (!paymentMode) {
-        alert('Please select a payment mode');
+        showNotification('Please select a payment method', 'warning');
         return;
     }
     
     if (amountPaid < totalCost) {
-        alert('Amount paid must be at least equal to total cost');
+        showNotification('Amount paid must be at least equal to total cost', 'warning');
         return;
     }
     
@@ -374,11 +1047,17 @@ function submitSale() {
         change_given: Math.max(0, amountPaid - totalCost),
         payment_mode: paymentMode,
         items: selectedItems.map(item => ({
-            variant_id: item.variant_id,
+            product_variant_id: item.product_variant_id,
             quantity: item.quantity,
             price: item.price
         }))
     };
+    
+    // Show loading state
+    const submitBtn = document.querySelector('.btn-success');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<div class="loading-spinner"></div> Processing...';
+    submitBtn.disabled = true;
     
     // Submit sale
     fetch('/api/manual-sale', {
@@ -391,15 +1070,20 @@ function submitSale() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Sale completed successfully!');
+            showNotification('Sale completed successfully!', 'success');
             clearForm();
         } else {
-            alert('Error: ' + data.message);
+            showNotification('Error: ' + data.message, 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error completing sale. Please try again.');
+        showNotification('Error completing sale. Please try again.', 'error');
+    })
+    .finally(() => {
+        // Restore button state
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
     });
 }
 
@@ -411,8 +1095,99 @@ function clearForm() {
     document.getElementById('amountPaid').value = '';
     document.getElementById('productSearch').value = '';
     document.getElementById('searchResults').style.display = 'none';
+    
+    // Remove selected styling from products
+    document.querySelectorAll('.product-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    
     updateSelectedItemsDisplay();
     updateTotalCost();
+    updateSaleStatus();
+    
+    showNotification('Form cleared successfully', 'success');
+}
+
+function printReceipt() {
+    if (selectedItems.length === 0) {
+        showNotification('No items to print receipt for', 'warning');
+        return;
+    }
+    
+    // Create receipt content
+    const receiptContent = `
+        <div style="font-family: monospace; padding: 20px;">
+            <h2 style="text-align: center;">KABOY AGROVET</h2>
+            <h3 style="text-align: center;">SALES RECEIPT</h3>
+            <hr>
+            <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
+            <p><strong>Customer:</strong> ${document.getElementById('customerName').value || 'Walk-in Customer'}</p>
+            <p><strong>Payment:</strong> ${document.getElementById('paymentMode').value}</p>
+            <hr>
+            <h4>Items:</h4>
+            ${selectedItems.map(item => `
+                <p>${item.product_name} (${item.quantity_value} ${item.quantity_unit}) x ${item.quantity} = KSh ${(item.quantity * item.price).toFixed(2)}</p>
+            `).join('')}
+            <hr>
+            <h3>Total: KSh ${totalCost.toFixed(2)}</h3>
+            <p><strong>Amount Paid:</strong> KSh ${(parseFloat(document.getElementById('amountPaid').value) || 0).toFixed(2)}</p>
+            <p><strong>Change:</strong> KSh ${Math.max(0, (parseFloat(document.getElementById('amountPaid').value) || 0) - totalCost).toFixed(2)}</p>
+        </div>
+    `;
+    
+    // Open print window
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(receiptContent);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show notification-pulse`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 350px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        border-radius: 16px;
+        border: none;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+        border-left: 6px solid ${type === 'success' ? '#48bb78' : type === 'warning' ? '#ed8936' : type === 'error' ? '#e53e3e' : '#4299e1'};
+        transform: translateX(100%);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    `;
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    notification.innerHTML = `
+        <i class="fa fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'error' ? 'times-circle' : 'info-circle'}"></i>
+        ${message}
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+    
+    // Remove on close button click
+    notification.querySelector('.close').onclick = () => {
+        notification.remove();
+    };
 }
 
 // Allow Enter key to search
@@ -420,6 +1195,11 @@ document.getElementById('productSearch').addEventListener('keypress', function(e
     if (e.key === 'Enter') {
         searchProducts();
     }
+});
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    updateSaleStatus();
 });
 </script>
 {% endblock %}

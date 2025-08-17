@@ -1285,6 +1285,10 @@ if (checkoutForm && checkoutFormMessage) {
                 selling_price: item.sellingPrice, // Include price for backend verification/record
             }))
         };
+        
+        // Debug: Log the cart structure and order data
+        console.log('Cart items:', cart);
+        console.log('Order data being sent:', orderData);
 
         // --- Actual Backend Submission (Call /api/submit-full-order) ---
         try {

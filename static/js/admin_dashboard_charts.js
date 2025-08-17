@@ -1,543 +1,508 @@
-// Admin Dashboard Charts & Stats
+// Admin Dashboard Charts and Analytics JavaScript
 
-// Global modal functions (accessible from HTML onclick)
-window.showOfflineSalesModal = async function() {
-    const modal = document.getElementById('offlineSalesModal');
-    const salesList = document.getElementById('offlineSalesList');
-    
-    // Show loading message
-    salesList.innerHTML = '<p style="text-align:center;color:var(--text-light);">Loading offline sales...</p>';
-    modal.style.display = 'block';
-    
-    try {
-        const response = await fetch('/api/dashboard/recent-offline-sales');
-        const salesData = await response.json();
-        
-        if (salesData.length > 0) {
-            const tableHTML = `
-                <div style="overflow-x:auto;">
-                    <table style="width:100%;border-collapse:collapse;margin-top:10px;">
-                        <thead>
-                            <tr style="background-color:var(--light-color);">
-                                <th style="padding:12px;text-align:left;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Sale ID</th>
-                                <th style="padding:12px;text-align:left;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Customer</th>
-                                <th style="padding:12px;text-align:right;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Total</th>
-                                <th style="padding:12px;text-align:right;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Paid</th>
-                                <th style="padding:12px;text-align:center;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Payment</th>
-                                <th style="padding:12px;text-align:left;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Date</th>
-                                <th style="padding:12px;text-align:left;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Items</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${salesData.map(sale => `
-                                <tr style="border-bottom:1px solid #eee;">
-                                    <td style="padding:10px;border:1px solid #ddd;font-weight:600;color:var(--primary-color);">#${sale.id}</td>
-                                    <td style="padding:10px;border:1px solid #ddd;">${sale.customer_name}</td>
-                                    <td style="padding:10px;border:1px solid #ddd;text-align:right;font-weight:600;color:var(--primary-color);">KSh ${Number(sale.total_cost).toLocaleString()}</td>
-                                    <td style="padding:10px;border:1px solid #ddd;text-align:right;">KSh ${Number(sale.amount_paid).toLocaleString()}</td>
-                                    <td style="padding:10px;border:1px solid #ddd;text-align:center;">
-                                        <span style="background-color:var(--accent-color);color:white;padding:3px 8px;border-radius:10px;font-size:0.8rem;">
-                                            ${sale.payment_mode}
-                                        </span>
-                                    </td>
-                                    <td style="padding:10px;border:1px solid #ddd;font-size:0.9rem;">${sale.sale_date}</td>
-                                    <td style="padding:10px;border:1px solid #ddd;">
-                                        <ul style="margin:0;padding-left:15px;">
-                                            ${sale.items.map(item => `
-                                                <li style="font-size:0.9rem;margin-bottom:3px;">
-                                                    ${item.quantity}x ${item.product_name} (${item.variant}) - KSh ${Number(item.price).toLocaleString()}
-                                                </li>
-                                            `).join('')}
-                                        </ul>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-                <div style="margin-top:15px;padding:10px;background-color:#e8f5e9;border:1px solid #c3e6cb;border-radius:5px;">
-                    <p style="margin:0;color:var(--primary-color);font-size:0.9rem;">
-                        <strong>💰 Summary:</strong> Showing the ${salesData.length} most recent offline sales transactions.
-                    </p>
-                </div>
-            `;
-            salesList.innerHTML = tableHTML;
-        } else {
-            salesList.innerHTML = `
-                <div style="text-align:center;padding:40px;">
-                    <span style="font-size:3rem;color:var(--accent-color);">🏪</span>
-                    <h3 style="color:var(--primary-color);margin:15px 0 10px 0;">No Offline Sales Yet</h3>
-                    <p style="color:var(--text-light);margin:0;">No offline sales have been recorded yet.</p>
-                </div>
-            `;
-        }
-    } catch (error) {
-        console.error('Error fetching offline sales:', error);
-        salesList.innerHTML = `
-            <div style="text-align:center;padding:40px;">
-                <span style="font-size:3rem;color:#d32f2f;">⚠️</span>
-                <h3 style="color:#d32f2f;margin:15px 0 10px 0;">Error Loading Data</h3>
-                <p style="color:var(--text-light);margin:0;">Failed to load offline sales data. Please try again.</p>
-            </div>
-        `;
+class AdminDashboard {
+    constructor() {
+        this.charts = {};
+        this.data = {};
+        this.refreshInterval = null;
+        this.init();
     }
-};
 
-window.showOnlineOrdersModal = async function() {
-    const modal = document.getElementById('onlineOrdersModal');
-    const ordersList = document.getElementById('onlineOrdersList');
-    
-    // Show loading message
-    ordersList.innerHTML = '<p style="text-align:center;color:var(--text-light);">Loading online orders...</p>';
-    modal.style.display = 'block';
-    
-    try {
-        const response = await fetch('/api/dashboard/recent-online-orders');
-        const ordersData = await response.json();
-        
-        if (ordersData.length > 0) {
-            const tableHTML = `
-                <div style="overflow-x:auto;">
-                    <table style="width:100%;border-collapse:collapse;margin-top:10px;">
-                        <thead>
-                            <tr style="background-color:var(--light-color);">
-                                <th style="padding:12px;text-align:left;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Order ID</th>
-                                <th style="padding:12px;text-align:left;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Customer</th>
-                                <th style="padding:12px;text-align:left;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Contact</th>
-                                <th style="padding:12px;text-align:right;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Total</th>
-                                <th style="padding:12px;text-align:center;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Status</th>
-                                <th style="padding:12px;text-align:left;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Date</th>
-                                <th style="padding:12px;text-align:left;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Items</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${ordersData.map(order => {
-                                const statusColor = order.payment_status === 'Paid' ? '#e8f5e9' : order.payment_status === 'Pending' ? '#fffde7' : '#ffebee';
-                                const statusTextColor = order.payment_status === 'Paid' ? 'var(--primary-color)' : order.payment_status === 'Pending' ? 'var(--accent-color)' : '#d32f2f';
-                                return `
-                                    <tr style="border-bottom:1px solid #eee;">
-                                        <td style="padding:10px;border:1px solid #ddd;font-weight:600;color:var(--primary-color);">#${order.id}</td>
-                                        <td style="padding:10px;border:1px solid #ddd;">${order.customer_name}</td>
-                                        <td style="padding:10px;border:1px solid #ddd;font-size:0.9rem;">
-                                            <div>${order.customer_email}</div>
-                                            <div style="color:var(--text-light);">${order.customer_phone}</div>
-                                        </td>
-                                        <td style="padding:10px;border:1px solid #ddd;text-align:right;font-weight:600;color:var(--primary-color);">KSh ${Number(order.total_amount).toLocaleString()}</td>
-                                        <td style="padding:10px;border:1px solid #ddd;text-align:center;">
-                                            <span style="background-color:${statusColor};color:${statusTextColor};padding:3px 8px;border-radius:10px;font-size:0.8rem;font-weight:600;">
-                                                ${order.payment_status}
-                                            </span>
-                                        </td>
-                                        <td style="padding:10px;border:1px solid #ddd;font-size:0.9rem;">${order.ordered_at}</td>
-                                        <td style="padding:10px;border:1px solid #ddd;">
-                                            <ul style="margin:0;padding-left:15px;">
-                                                ${order.items.map(item => `
-                                                    <li style="font-size:0.9rem;margin-bottom:3px;">
-                                                        ${item.quantity}x ${item.product_name} (${item.variant}) - KSh ${Number(item.price).toLocaleString()}
-                                                    </li>
-                                                `).join('')}
-                                            </ul>
-                                        </td>
-                                    </tr>
-                                `;
-                            }).join('')}
-                        </tbody>
-                    </table>
-                </div>
-                <div style="margin-top:15px;padding:10px;background-color:#e8f5e9;border:1px solid #c3e6cb;border-radius:5px;">
-                    <p style="margin:0;color:var(--primary-color);font-size:0.9rem;">
-                        <strong>🛒 Summary:</strong> Showing the ${ordersData.length} most recent online orders.
-                    </p>
-                </div>
-            `;
-            ordersList.innerHTML = tableHTML;
-        } else {
-            ordersList.innerHTML = `
-                <div style="text-align:center;padding:40px;">
-                    <span style="font-size:3rem;color:var(--primary-color);">🛒</span>
-                    <h3 style="color:var(--primary-color);margin:15px 0 10px 0;">No Online Orders Yet</h3>
-                    <p style="color:var(--text-light);margin:0;">No online orders have been placed yet.</p>
-                </div>
-            `;
-        }
-    } catch (error) {
-        console.error('Error fetching online orders:', error);
-        ordersList.innerHTML = `
-            <div style="text-align:center;padding:40px;">
-                <span style="font-size:3rem;color:#d32f2f;">⚠️</span>
-                <h3 style="color:#d32f2f;margin:15px 0 10px 0;">Error Loading Data</h3>
-                <p style="color:var(--text-light);margin:0;">Failed to load online orders data. Please try again.</p>
-            </div>
-        `;
+    init() {
+        this.setupEventListeners();
+        this.loadDashboardData();
+        this.startAutoRefresh();
     }
-};
 
-// Load dashboard data when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    loadDashboardData();
-    loadCharts();
-});
-
-// Load all dashboard data
-function loadDashboardData() {
-    loadRecentOnlineOrders();
-    loadRecentOfflineSales();
-    loadLowStockProducts();
-    loadDashboardStats();
-}
-
-// Load recent online orders
-function loadRecentOnlineOrders() {
-    fetch('/api/dashboard/recent-online-orders')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('recentOnlineOrders');
-            if (data.recent_orders && data.recent_orders.length > 0) {
-                let html = '<div style="display:flex;flex-direction:column;gap:0.5rem;">';
-                data.recent_orders.forEach(order => {
-                    const statusColor = order.payment_status === 'Paid' ? '#4caf50' : 
-                                      order.payment_status === 'Pending' ? '#ff9800' : '#f44336';
-                    html += `
-                        <div style="border:1px solid #e0e0e0;border-radius:8px;padding:0.8rem;background:#fafafa;">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-                                <strong style="color:var(--primary-color);">${order.customer_name}</strong>
-                                <span style="padding:0.2em 0.6em;border-radius:12px;background:${statusColor};color:white;font-size:0.8rem;font-weight:600;">
-                                    ${order.payment_status}
-                                </span>
-                            </div>
-                            <div style="font-size:0.9rem;color:var(--text-light);margin-bottom:0.3rem;">
-                                📧 ${order.customer_email} | 📞 ${order.customer_phone}
-                            </div>
-                            <div style="display:flex;justify-content:space-between;align-items:center;">
-                                <span style="font-weight:600;color:var(--primary-color);">KSh ${order.total_amount.toFixed(2)}</span>
-                                <span style="font-size:0.8rem;color:var(--text-light);">${order.ordered_at}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = '<p style="text-align:center;color:var(--text-light);">No recent online orders</p>';
-            }
-        })
-        .catch(error => {
-            console.error('Error loading recent online orders:', error);
-            document.getElementById('recentOnlineOrders').innerHTML = 
-                '<p style="text-align:center;color:#f44336;">Error loading orders</p>';
+    setupEventListeners() {
+        // Navigation
+        document.querySelectorAll('.nav-link[data-section]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleNavigation(e.target.closest('.nav-link').dataset.section);
+            });
         });
-}
 
-// Load recent offline sales
-function loadRecentOfflineSales() {
-    fetch('/api/dashboard/recent-offline-sales')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('recentOfflineSales');
-            if (data.recent_sales && data.recent_sales.length > 0) {
-                let html = '<div style="display:flex;flex-direction:column;gap:0.5rem;">';
-                data.recent_sales.forEach(sale => {
-                    const paymentColor = sale.payment_mode === 'Cash' ? '#4caf50' : 
-                                       sale.payment_mode === 'M-Pesa' ? '#2196f3' : '#ff9800';
-                    html += `
-                        <div style="border:1px solid #e0e0e0;border-radius:8px;padding:0.8rem;background:#fafafa;">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-                                <strong style="color:var(--accent-color);">${sale.customer_name}</strong>
-                                <span style="padding:0.2em 0.6em;border-radius:12px;background:${paymentColor};color:white;font-size:0.8rem;font-weight:600;">
-                                    ${sale.payment_mode}
-                                </span>
-                            </div>
-                            <div style="font-size:0.9rem;color:var(--text-light);margin-bottom:0.3rem;">
-                                💰 Paid: KSh ${sale.amount_paid.toFixed(2)} | 💸 Change: KSh ${sale.change_given.toFixed(2)}
-                            </div>
-                            <div style="display:flex;justify-content:space-between;align-items:center;">
-                                <span style="font-weight:600;color:var(--accent-color);">KSh ${sale.total_cost.toFixed(2)}</span>
-                                <span style="font-size:0.8rem;color:var(--text-light);">${sale.sale_date}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = '<p style="text-align:center;color:var(--text-light);">No recent offline sales</p>';
-            }
-        })
-        .catch(error => {
-            console.error('Error loading recent offline sales:', error);
-            document.getElementById('recentOfflineSales').innerHTML = 
-                '<p style="text-align:center;color:#f44336;">Error loading sales</p>';
-        });
-}
+        // Refresh button
+        const refreshBtn = document.querySelector('.btn-secondary');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.refreshDashboard());
+        }
 
-// Load low stock products
-function loadLowStockProducts() {
-    fetch('/api/dashboard/stock-levels')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('lowStockProducts');
-            if (data.low_stock_items && data.low_stock_items.length > 0) {
-                let html = '<div style="display:flex;flex-direction:column;gap:0.5rem;">';
-                data.low_stock_items.forEach(item => {
-                    const stockColor = item.stock_level === 0 ? '#f44336' : 
-                                     item.stock_level < 5 ? '#ff9800' : '#ffc107';
-                    html += `
-                        <div style="border:1px solid #e0e0e0;border-radius:8px;padding:0.8rem;background:#fafafa;">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-                                <strong style="color:#d32f2f;">${item.product_name}</strong>
-                                <span style="padding:0.2em 0.6em;border-radius:12px;background:${stockColor};color:white;font-size:0.8rem;font-weight:600;">
-                                    ${item.stock_level} left
-                                </span>
-                            </div>
-                            <div style="font-size:0.9rem;color:var(--text-light);margin-bottom:0.3rem;">
-                                📦 ${item.variant_info} | 💰 KSh ${item.selling_price.toFixed(2)}
-                            </div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = '<p style="text-align:center;color:var(--text-light);">All products have sufficient stock</p>';
-            }
-        })
-        .catch(error => {
-            console.error('Error loading low stock products:', error);
-            document.getElementById('lowStockProducts').innerHTML = 
-                '<p style="text-align:center;color:#f44336;">Error loading stock data</p>';
-        });
-}
+        // Manual sale button
+        const manualSaleBtn = document.querySelector('a[href="/admin/manual_sale"]');
+        if (manualSaleBtn) {
+            manualSaleBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.openManualSale();
+            });
+        }
+    }
 
-// Load dashboard statistics
-function loadDashboardStats() {
-    fetch('/api/dashboard/stats')
-        .then(response => response.json())
-        .then(data => {
-            // Update statistics cards
-            document.getElementById('online-orders-count').textContent = data.total_orders;
-            document.getElementById('offline-sales-count').textContent = data.total_offline_sales;
+    async loadDashboardData() {
+        try {
+            this.showLoading();
             
-            // Update offline items count
-            const offlineItemsCount = document.getElementById('offline-items-count');
-            if (offlineItemsCount) {
-                offlineItemsCount.textContent = `${data.total_offline_sales} total sales`;
+            const response = await fetch('/api/dashboard-data');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-        })
-        .catch(error => {
-            console.error('Error loading dashboard stats:', error);
-        });
-    
-    // Get low stock count from stock-levels API
-    fetch('/api/dashboard/stock-levels')
-        .then(response => response.json())
-        .then(data => {
-            const lowStockCount = data.low_stock_items ? data.low_stock_items.length : 0;
-            document.getElementById('low-stock-count').textContent = lowStockCount;
-        })
-        .catch(error => {
-            console.error('Error loading stock levels:', error);
-            document.getElementById('low-stock-count').textContent = '0';
-        });
-}
+            
+            this.data = await response.json();
+            this.updateDashboard();
+            this.hideLoading();
+            this.showNotification('Dashboard updated successfully!', 'success');
+            
+        } catch (error) {
+            console.error('Error loading dashboard data:', error);
+            this.hideLoading();
+            this.showNotification(`Failed to load dashboard: ${error.message}`, 'error');
+            this.loadSampleData(); // Fallback to sample data
+        }
+    }
 
-// Load charts
-function loadCharts() {
-    renderSalesTrendChart();
-    renderStockLevelsChart();
-}
+    loadSampleData() {
+        // Fallback sample data for demonstration
+        this.data = {
+            stats: {
+                total_revenue: 125000,
+                total_orders: 45,
+                total_products: 28,
+                total_customers: 32,
+                revenue_change: 12.5,
+                orders_change: 8.3,
+                products_change: 5.2,
+                customers_change: 15.7
+            },
+            revenue_trend: [
+                { date: 'Mon', revenue: 15000 },
+                { date: 'Tue', revenue: 18000 },
+                { date: 'Wed', revenue: 22000 },
+                { date: 'Thu', revenue: 19000 },
+                { date: 'Fri', revenue: 25000 },
+                { date: 'Sat', revenue: 30000 },
+                { date: 'Sun', revenue: 28000 }
+            ],
+            top_products: [
+                { name: 'NPK Fertilizer', sales: 15 },
+                { name: 'DAP Fertilizer', sales: 12 },
+                { name: 'Pesticide', sales: 8 },
+                { name: 'Seeds Mix', sales: 6 },
+                { name: 'Other', sales: 4 }
+            ],
+            recent_activities: [
+                {
+                    type: 'sale',
+                    title: 'New Sale Recorded',
+                    description: 'NPK Fertilizer 50kg - KSh 2,500',
+                    timestamp: new Date(Date.now() - 300000)
+                },
+                {
+                    type: 'order',
+                    title: 'Online Order Received',
+                    description: 'Order #123 from John Doe',
+                    timestamp: new Date(Date.now() - 900000)
+                },
+                {
+                    type: 'product',
+                    title: 'Stock Updated',
+                    description: 'Pesticide stock increased by 20 units',
+                    timestamp: new Date(Date.now() - 1800000)
+                },
+                {
+                    type: 'customer',
+                    title: 'New Customer Registered',
+                    description: 'Jane Smith - jane@email.com',
+                    timestamp: new Date(Date.now() - 3600000)
+                }
+            ]
+        };
+        
+        this.updateDashboard();
+    }
 
-// --- Render Sales Trends Chart ---
-async function renderSalesTrendChart() {
-    try {
-        const response = await fetch('/api/dashboard/sales-trends');
-        const data = await response.json();
+    updateDashboard() {
+        this.updateStats();
+        this.updateCharts();
+        this.updateActivity();
+    }
 
-        const ctx = document.getElementById('salesTrendChart').getContext('2d');
-        new Chart(ctx, {
+    updateStats() {
+        const stats = this.data.stats || {};
+        
+        // Update stat values
+        this.updateStatElement('total-revenue', `KSh ${(stats.total_revenue || 0).toLocaleString()}`);
+        this.updateStatElement('total-orders', (stats.total_orders || 0).toLocaleString());
+        this.updateStatElement('total-products', (stats.total_products || 0).toLocaleString());
+        this.updateStatElement('total-customers', (stats.total_customers || 0).toLocaleString());
+        
+        // Update change indicators
+        this.updateChangeIndicator('revenue-change', stats.revenue_change);
+        this.updateChangeIndicator('orders-change', stats.orders_change);
+        this.updateChangeIndicator('products-change', stats.products_change);
+        this.updateChangeIndicator('customers-change', stats.customers_change);
+    }
+
+    updateStatElement(id, value) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        }
+    }
+
+    updateChangeIndicator(id, change) {
+        const element = document.getElementById(id);
+        if (!element) return;
+        
+        if (change > 0) {
+            element.textContent = `+${change.toFixed(1)}% from last month`;
+            element.className = 'stat-change';
+        } else if (change < 0) {
+            element.textContent = `${change.toFixed(1)}% from last month`;
+            element.className = 'stat-change negative';
+        } else {
+            element.textContent = 'No change from last month';
+            element.className = 'stat-change';
+        }
+    }
+
+    updateCharts() {
+        this.updateRevenueChart();
+        this.updateProductsChart();
+    }
+
+    updateRevenueChart() {
+        const ctx = document.getElementById('revenue-chart');
+        if (!ctx) return;
+        
+        const data = this.data.revenue_trend || [];
+        
+        if (this.charts.revenue) {
+            this.charts.revenue.destroy();
+        }
+        
+        this.charts.revenue = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: data.labels,
+                labels: data.map(item => item.date),
                 datasets: [{
-                    label: 'Total Sales (KSh)',
-                    data: data.data,
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1,
-                    fill: false
+                    label: 'Revenue (KSh)',
+                    data: data.map(item => item.revenue),
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#667eea',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: true
-                    },
-                    title: {
                         display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#667eea',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: false
                     }
                 },
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return 'KSh ' + value.toLocaleString();
+                            },
+                            color: '#666'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        ticks: {
+                            color: '#666'
+                        }
                     }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
                 }
             }
         });
-    } catch (error) {
-        console.error('Error rendering sales trend chart:', error);
     }
-}
 
-// --- Render Stock Levels Chart ---
-async function renderStockLevelsChart() {
-    try {
-        const response = await fetch('/api/dashboard/stock-levels');
-        const data = await response.json();
-
-        const ctx = document.getElementById('stockLevelsChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
+    updateProductsChart() {
+        const ctx = document.getElementById('products-chart');
+        if (!ctx) return;
+        
+        const data = this.data.top_products || [];
+        
+        if (this.charts.products) {
+            this.charts.products.destroy();
+        }
+        
+        this.charts.products = new Chart(ctx, {
+            type: 'doughnut',
             data: {
-                labels: data.labels,
+                labels: data.map(item => item.name),
                 datasets: [{
-                    label: 'Stock Level',
-                    data: data.data,
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                    borderColor: 'rgb(75, 192, 192)',
-                    borderWidth: 1
+                    data: data.map(item => item.sales),
+                    backgroundColor: [
+                        '#667eea',
+                        '#764ba2',
+                        '#f093fb',
+                        '#f5576c',
+                        '#4facfe',
+                        '#00f2fe',
+                        '#43e97b',
+                        '#38f9d7'
+                    ],
+                    borderWidth: 0,
+                    hoverBorderWidth: 2,
+                    hoverBorderColor: '#fff'
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: false
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            font: {
+                                size: 12
+                            }
+                        }
                     },
-                    title: {
-                        display: false
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#667eea',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${label}: ${value} sales (${percentage}%)`;
+                            }
+                        }
                     }
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
+                cutout: '60%'
             }
         });
-    } catch (error) {
-        console.error('Error rendering stock levels chart:', error);
+    }
+
+    updateActivity() {
+        const activityList = document.getElementById('activity-list');
+        if (!activityList) return;
+        
+        const activities = this.data.recent_activities || [];
+        
+        if (activities.length === 0) {
+            activityList.innerHTML = `
+                <li class="activity-item">
+                    <div class="activity-content">
+                        <h4>No recent activity</h4>
+                        <p>Start making sales to see activity here</p>
+                    </div>
+                </li>
+            `;
+            return;
+        }
+        
+        activityList.innerHTML = activities.map(activity => `
+            <li class="activity-item">
+                <div class="activity-icon" style="background: ${this.getActivityColor(activity.type)};">
+                    <i class="fas ${this.getActivityIcon(activity.type)}"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>${activity.title}</h4>
+                    <p>${activity.description}</p>
+                </div>
+                <div class="activity-time">${this.formatTime(activity.timestamp)}</div>
+            </li>
+        `).join('');
+    }
+
+    getActivityColor(type) {
+        const colors = {
+            'sale': 'linear-gradient(135deg, #667eea, #764ba2)',
+            'order': 'linear-gradient(135deg, #f093fb, #f5576c)',
+            'product': 'linear-gradient(135deg, #4facfe, #00f2fe)',
+            'customer': 'linear-gradient(135deg, #43e97b, #38f9d7)'
+        };
+        return colors[type] || colors.sale;
+    }
+
+    getActivityIcon(type) {
+        const icons = {
+            'sale': 'fa-dollar-sign',
+            'order': 'fa-shopping-cart',
+            'product': 'fa-box',
+            'customer': 'fa-user'
+        };
+        return icons[type] || 'fa-info-circle';
+    }
+
+    formatTime(timestamp) {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diff = now - date;
+        
+        if (diff < 60000) return 'Just now';
+        if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+        if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+        return date.toLocaleDateString();
+    }
+
+    handleNavigation(section) {
+        // Update active navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        document.querySelector(`[data-section="${section}"]`).classList.add('active');
+        
+        // Handle section-specific logic
+        switch(section) {
+            case 'overview':
+                this.showOverview();
+                break;
+            case 'products':
+                this.showProducts();
+                break;
+            case 'orders':
+                this.showOrders();
+                break;
+            case 'customers':
+                this.showCustomers();
+                break;
+            case 'analytics':
+                this.showAnalytics();
+                break;
+            case 'settings':
+                this.showSettings();
+                break;
+        }
+    }
+
+    showOverview() {
+        // Default view - already shown
+    }
+
+    showProducts() {
+        // TODO: Implement products view
+        this.showNotification('Products view coming soon!', 'success');
+    }
+
+    showOrders() {
+        // TODO: Implement orders view
+        this.showNotification('Orders view coming soon!', 'success');
+    }
+
+    showCustomers() {
+        // TODO: Implement customers view
+        this.showNotification('Customers view coming soon!', 'success');
+    }
+
+    showAnalytics() {
+        // TODO: Implement analytics view
+        this.showNotification('Analytics view coming soon!', 'success');
+    }
+
+    showSettings() {
+        // TODO: Implement settings view
+        this.showNotification('Settings view coming soon!', 'success');
+    }
+
+    openManualSale() {
+        window.open('/admin/manual_sale', '_blank');
+    }
+
+    refreshDashboard() {
+        this.loadDashboardData();
+    }
+
+    startAutoRefresh() {
+        // Refresh every 5 minutes
+        this.refreshInterval = setInterval(() => {
+            this.loadDashboardData();
+        }, 300000);
+    }
+
+    stopAutoRefresh() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+            this.refreshInterval = null;
+        }
+    }
+
+    showLoading() {
+        const elements = ['total-revenue', 'total-orders', 'total-products', 'total-customers'];
+        elements.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.innerHTML = '<span class="loading"></span>';
+            }
+        });
+    }
+
+    hideLoading() {
+        // Loading is hidden when data is loaded
+    }
+
+    showNotification(message, type = 'success') {
+        const notification = document.getElementById('notification');
+        if (!notification) return;
+        
+        notification.textContent = message;
+        notification.className = `notification ${type} show`;
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
+    }
+
+    destroy() {
+        this.stopAutoRefresh();
+        Object.values(this.charts).forEach(chart => {
+            if (chart && typeof chart.destroy === 'function') {
+                chart.destroy();
+            }
+        });
     }
 }
 
-// --- Modal Functions ---
-function showLowStockModal() {
-    const modal = document.getElementById('lowStockModal');
-    const productsList = document.getElementById('lowStockProductsList');
-    
-    if (window.lowStockItems && window.lowStockItems.length > 0) {
-        // Create a nice table to display low stock products
-        const tableHTML = `
-            <div style="overflow-x:auto;">
-                <table style="width:100%;border-collapse:collapse;margin-top:10px;">
-                    <thead>
-                        <tr style="background-color:var(--light-color);">
-                            <th style="padding:12px;text-align:left;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Product</th>
-                            <th style="padding:12px;text-align:left;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Variant</th>
-                            <th style="padding:12px;text-align:center;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Stock Level</th>
-                            <th style="padding:12px;text-align:left;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Category</th>
-                            <th style="padding:12px;text-align:right;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Price</th>
-                            <th style="padding:12px;text-align:left;border:1px solid #ddd;color:var(--primary-color);font-weight:600;">Expiry</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${window.lowStockItems.map(item => `
-                            <tr style="border-bottom:1px solid #eee;">
-                                <td style="padding:10px;border:1px solid #ddd;font-weight:500;">${item.name}</td>
-                                <td style="padding:10px;border:1px solid #ddd;">${item.variant}</td>
-                                <td style="padding:10px;border:1px solid #ddd;text-align:center;">
-                                    <span style="background-color:#ffebee;color:#d32f2f;padding:4px 8px;border-radius:12px;font-weight:600;font-size:0.9rem;">
-                                        ${item.stock}
-                                    </span>
-                                </td>
-                                <td style="padding:10px;border:1px solid #ddd;">
-                                    <span style="background-color:var(--secondary-color);color:white;padding:3px 8px;border-radius:10px;font-size:0.8rem;">
-                                        ${item.category}
-                                    </span>
-                                </td>
-                                <td style="padding:10px;border:1px solid #ddd;text-align:right;font-weight:600;color:var(--primary-color);">KSh ${Number(item.selling_price).toLocaleString()}</td>
-                                <td style="padding:10px;border:1px solid #ddd;font-size:0.9rem;color:var(--text-light);">${item.expiry_date || 'N/A'}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
-            <div style="margin-top:15px;padding:10px;background-color:#fff3cd;border:1px solid #ffeaa7;border-radius:5px;">
-                <p style="margin:0;color:#856404;font-size:0.9rem;">
-                    <strong>💡 Tip:</strong> Consider restocking these items soon to avoid running out of inventory.
-                </p>
-            </div>
-        `;
-        productsList.innerHTML = tableHTML;
-    } else {
-        productsList.innerHTML = `
-            <div style="text-align:center;padding:40px;">
-                <span style="font-size:3rem;color:var(--primary-color);">✅</span>
-                <h3 style="color:var(--primary-color);margin:15px 0 10px 0;">Great News!</h3>
-                <p style="color:var(--text-light);margin:0;">All products are well stocked. No low stock alerts at this time.</p>
-            </div>
-        `;
-    }
-    
-    modal.style.display = 'block';
-}
-
-function hideLowStockModal() {
-    const modal = document.getElementById('lowStockModal');
-    modal.style.display = 'none';
-}
-
-// Modal hide functions (global functions are defined above)
-function hideOfflineSalesModal() {
-    const modal = document.getElementById('offlineSalesModal');
-    modal.style.display = 'none';
-}
-
-function hideOnlineOrdersModal() {
-    const modal = document.getElementById('onlineOrdersModal');
-    modal.style.display = 'none';
-}
-
-// Set up modal close handlers
-document.addEventListener('click', function(event) {
-    // Handle Low Stock Modal
-    const lowStockModal = document.getElementById('lowStockModal');
-    const lowStockCloseBtn = lowStockModal.querySelector('.close');
-    
-    if (event.target === lowStockCloseBtn || event.target === lowStockModal) {
-        hideLowStockModal();
-    }
-    
-    // Handle Offline Sales Modal
-    const offlineSalesModal = document.getElementById('offlineSalesModal');
-    const offlineSalesCloseBtn = offlineSalesModal.querySelector('.close');
-    
-    if (event.target === offlineSalesCloseBtn || event.target === offlineSalesModal) {
-        hideOfflineSalesModal();
-    }
-    
-    // Handle Online Orders Modal
-    const onlineOrdersModal = document.getElementById('onlineOrdersModal');
-    const onlineOrdersCloseBtn = onlineOrdersModal.querySelector('.close');
-    
-    if (event.target === onlineOrdersCloseBtn || event.target === onlineOrdersModal) {
-        hideOnlineOrdersModal();
-    }
+// Initialize dashboard when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    window.adminDashboard = new AdminDashboard();
 });
 
-// Close modals with Escape key
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        hideLowStockModal();
-        hideOfflineSalesModal();
-        hideOnlineOrdersModal();
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    if (window.adminDashboard) {
+        window.adminDashboard.destroy();
     }
 });
