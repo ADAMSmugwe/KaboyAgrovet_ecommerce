@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Marketing Email - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #6f42c1, #e83e8c);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/admin-dashboard">
+                <i class="fas fa-tachometer-alt"></i> Kaboy Agrovet Admin
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/admin-dashboard">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a class="nav-link" href="/admin-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Stats Card -->
+        <div class="stats-card">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4><i class="fas fa-users"></i> Active Subscribers</h4>
+                    <h2>{{ subscriber_count }}</h2>
+                </div>
+                <div class="col-md-6 text-end">
+                    <h4><i class="fas fa-envelope"></i> Marketing Campaigns</h4>
+                    <p>Send promotional emails to your subscribers</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marketing Email Form -->
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-paper-plane"></i> Send Marketing Email</h4>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Email Subject *</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="campaign_type" class="form-label">Campaign Type</label>
+                        <select class="form-select" id="campaign_type" name="campaign_type">
+                            <option value="newsletter">Newsletter</option>
+                            <option value="promotion">Promotion</option>
+                            <option value="announcement">Announcement</option>
+                            <option value="product_update">Product Update</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Email Content *</label>
+                        <textarea class="form-control" id="content" name="content" rows="10" required 
+                                  placeholder="Enter your email content here. You can use HTML formatting."></textarea>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> You can use HTML tags for formatting. 
+                            The content will be wrapped in our email template.
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/admin-dashboard" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane"></i> Send Email Campaign
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Email Tips -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="fas fa-lightbulb"></i> Email Marketing Tips</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-check-circle text-success"></i> Best Practices:</h6>
+                        <ul>
+                            <li>Keep subject lines clear and engaging</li>
+                            <li>Use personalization when possible</li>
+                            <li>Include clear call-to-actions</li>
+                            <li>Test your emails before sending</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-exclamation-triangle text-warning"></i> Avoid:</h6>
+                        <ul>
+                            <li>Spam trigger words</li>
+                            <li>All caps text</li>
+                            <li>Too many images</li>
+                            <li>Overly promotional language</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

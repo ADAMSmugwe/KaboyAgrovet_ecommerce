@@ -398,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
             change_given: changeGiven,
             payment_mode: paymentMode,
             total_cost: totalCost,
-            items_sold: currentSaleItems.map(item => ({
+            items: currentSaleItems.map(item => ({
                 product_variant_id: item.variantId,
                 quantity: item.quantity,
                 price_at_sale: item.sellingPrice

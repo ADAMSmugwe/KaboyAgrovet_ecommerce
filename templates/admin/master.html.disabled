@@ -1,0 +1,291 @@
+{% extends 'admin/base.html' %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/flask_admin_custom.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Additional custom styles for Flask Admin */
+        .admin-nav {
+            background: linear-gradient(135deg, #4a8f29 0%, #3a7a1f 100%);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        
+        .admin-nav .navbar-brand {
+            color: white !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .admin-nav .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-nav .nav-link:hover {
+            color: white !important;
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-1px);
+        }
+        
+        /* Override Bootstrap default styles */
+        .container-fluid {
+            padding: 0;
+        }
+        
+        .row {
+            margin: 0;
+        }
+        
+        /* Custom sidebar styling */
+        .col-md-2 {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-height: 100vh;
+            padding: 0;
+        }
+        
+        .col-md-10 {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        /* Model list styling */
+        .model-list {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .model-list .table {
+            margin: 0;
+        }
+        
+        /* Action buttons */
+        .btn-group .btn {
+            margin: 0 0.25rem;
+        }
+        
+        /* Search form */
+        .search-form {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        /* Pagination */
+        .pagination {
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        /* Flash messages */
+        .alert {
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Form styling */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+        }
+        
+        .form-control {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #4a8f29;
+            box-shadow: 0 0 0 0.2rem rgba(74, 143, 41, 0.25);
+        }
+        
+        /* Table improvements */
+        .table-responsive {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        /* Modal improvements */
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #4a8f29 0%, #3a7a1f 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        /* Loading states */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .col-md-10 {
+                padding: 1rem;
+            }
+            
+            .search-form {
+                padding: 1rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block page_body %}
+    <div class="admin-container">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg admin-nav">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{{ url_for('admin.index') }}">
+                    🌱 Kaboy Agrovet Admin
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                                📊 Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('submit_manual_sale') }}">
+                                💰 Manual Sales
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_logout') }}">
+                                🚪 Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2">
+                <div class="sidebar">
+                    <div class="sidebar-header" style="padding: 1.5rem; border-bottom: 1px solid #e9ecef;">
+                        <h5 style="color: #4a8f29; font-weight: 600; margin: 0;">
+                            📋 Admin Menu
+                        </h5>
+                    </div>
+                    
+                    <nav class="nav flex-column">
+                        {% for item in admin_view.admin.menu() %}
+                            <div class="nav-item">
+                                <a class="nav-link {% if item.class_name %}active{% endif %}" href="{{ item.url }}">
+                                    {% if item.class_name == 'order' %}🛒
+                                    {% elif item.class_name == 'product' %}📦
+                                    {% elif item.class_name == 'productvariant' %}⚙️
+                                    {% elif item.class_name == 'testimonial' %}💬
+                                    {% elif item.class_name == 'faq' %}❓
+                                    {% elif item.class_name == 'contactmessage' %}📧
+                                    {% elif item.class_name == 'orderitem' %}📋
+                                    {% elif item.class_name == 'offlinesale' %}🏪
+                                    {% elif item.class_name == 'offlinesaleitem' %}💰
+                                    {% elif item.class_name == 'customeranalytics' %}📊
+                                    {% elif item.class_name == 'productanalytics' %}📈
+                                    {% elif item.class_name == 'salesanalytics' %}📉
+                                    {% else %}📄{% endif %}
+                                    {{ item.name }}
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10">
+                <div class="content">
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Page Content -->
+                    {% block body %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block tail %}
+    {{ super() }}
+    <script>
+        // Add smooth animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add fade-in animation to content
+            const content = document.querySelector('.content');
+            if (content) {
+                content.classList.add('fade-in-up');
+            }
+            
+            // Add hover effects to table rows
+            const tableRows = document.querySelectorAll('.table tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-1px)';
+                    this.style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)';
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+            
+            // Add loading states to buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    if (!this.disabled) {
+                        this.classList.add('loading');
+                        setTimeout(() => {
+                            this.classList.remove('loading');
+                        }, 2000);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %} 

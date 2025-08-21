@@ -1,0 +1,214 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<div class="admin-welcome">
+    <div class="welcome-header text-center mb-5">
+        <h1 class="display-4 text-gradient mb-3">
+            🌱 Welcome to Kaboy Agrovet Admin
+        </h1>
+        <p class="lead text-muted">
+            Manage your products, orders, and business operations with ease
+        </p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="icon-wrapper mb-3">
+                        <span style="font-size: 3rem;">📦</span>
+                    </div>
+                    <h5 class="card-title">Products</h5>
+                    <p class="card-text">Manage your product catalog and variants</p>
+                    <a href="{{ url_for('product.index_view') }}" class="btn btn-primary">
+                        Manage Products
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="icon-wrapper mb-3">
+                        <span style="font-size: 3rem;">🛒</span>
+                    </div>
+                    <h5 class="card-title">Orders</h5>
+                    <p class="card-text">View and manage customer orders</p>
+                    <a href="{{ url_for('order.index_view') }}" class="btn btn-success">
+                        View Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="icon-wrapper mb-3">
+                        <span style="font-size: 3rem;">🏪</span>
+                    </div>
+                    <h5 class="card-title">Offline Sales</h5>
+                    <p class="card-text">Record and manage offline transactions</p>
+                    <a href="{{ url_for('offlinesale.index_view') }}" class="btn btn-warning">
+                        Manage Sales
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="icon-wrapper mb-3">
+                        <span style="font-size: 3rem;">📊</span>
+                    </div>
+                    <h5 class="card-title">Analytics</h5>
+                    <p class="card-text">View detailed business analytics</p>
+                    <a href="{{ url_for('analytics_dashboard') }}" class="btn btn-info">
+                        View Analytics
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">📈 Quick Stats</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <div class="stat-item">
+                                <h3 class="text-primary" id="total-orders">-</h3>
+                                <p class="text-muted">Total Orders</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="stat-item">
+                                <h3 class="text-success" id="total-products">-</h3>
+                                <p class="text-muted">Total Products</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="stat-item">
+                                <h3 class="text-warning" id="total-sales">-</h3>
+                                <p class="text-muted">Offline Sales</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="stat-item">
+                                <h3 class="text-danger" id="low-stock">-</h3>
+                                <p class="text-muted">Low Stock Items</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">⚡ Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('product.create_view') }}" class="btn btn-outline-primary">
+                            ➕ Add New Product
+                        </a>
+                        <a href="{{ url_for('manual_sale.index') }}" class="btn btn-outline-success">
+                            💰 Record Sale
+                        </a>
+                        <a href="{{ url_for('send_marketing_email_route') }}" class="btn btn-outline-info">
+                            📧 Send Email
+                        </a>
+                        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-warning">
+                            📊 Full Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.admin-welcome {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+}
+
+.card:hover .icon-wrapper {
+    transform: scale(1.1);
+    background: linear-gradient(135deg, #4a8f29 0%, #3a7a1f 100%);
+}
+
+.stat-item h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.stat-item p {
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-outline-primary:hover {
+    background: linear-gradient(135deg, #4a8f29 0%, #3a7a1f 100%);
+    border-color: #4a8f29;
+}
+
+.btn-outline-success:hover {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    border-color: #28a745;
+}
+
+.btn-outline-info:hover {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    border-color: #17a2b8;
+}
+
+.btn-outline-warning:hover {
+    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    border-color: #ffc107;
+    color: #212529;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load quick stats
+    fetch('/api/dashboard/stats')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById('total-orders').textContent = data.data.sales.total_orders;
+                document.getElementById('total-products').textContent = data.data.inventory.total_products;
+                document.getElementById('total-sales').textContent = data.data.sales.total_offline_sales;
+                document.getElementById('low-stock').textContent = data.data.inventory.low_stock_variants;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading stats:', error);
+        });
+});
+</script>
+{% endblock %} 

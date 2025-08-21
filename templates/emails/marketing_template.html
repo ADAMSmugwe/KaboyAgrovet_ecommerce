@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ campaign.subject }} - Kaboy Agrovet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .title {
+            color: #4a8f29;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .content {
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+        .unsubscribe {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .unsubscribe a {
+            color: #666;
+            text-decoration: none;
+        }
+        .unsubscribe a:hover {
+            text-decoration: underline;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #4a8f29;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .cta-button:hover {
+            background-color: #3a7a1f;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1 style="color: #4a8f29; margin: 0;">Kaboy Agrovet</h1>
+            <p style="color: #666; margin: 5px 0;">Your Trusted Agri-Partner in Nchiru</p>
+        </div>
+
+        <div class="content">
+            {% if recipient.name %}
+            <p>Dear {{ recipient.name }},</p>
+            {% else %}
+            <p>Dear Valued Customer,</p>
+            {% endif %}
+            
+            <div style="margin: 20px 0;">
+                {{ content | safe }}
+            </div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="http://127.0.0.1:5000" class="cta-button">Visit Our Store</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Kaboy Agrovet</strong></p>
+            <p>📍 Nchiru, Kenya</p>
+            <p>📍 Next to Meru University of Science and Technology</p>
+            <p>📧 Email: info@kaboyagrovet.com</p>
+            <p>📱 Phone: +254 XXX XXX XXX</p>
+            <p>© 2024 Kaboy Agrovet. All rights reserved.</p>
+        </div>
+
+        <div class="unsubscribe">
+            <p>You received this email because you subscribed to our newsletter.</p>
+            <p><a href="{{ url_for('unsubscribe_newsletter', token=recipient.unsubscribe_token, _external=True) }}">Unsubscribe</a> | 
+               <a href="http://127.0.0.1:5000">Visit Website</a></p>
+        </div>
+    </div>
+</body>
+</html> 

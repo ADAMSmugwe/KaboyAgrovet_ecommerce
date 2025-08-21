@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Management - Kaboy Agrovet Admin</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .purchase-container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .section-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .btn-custom {
+            background: #4a8f29;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        .btn-custom:hover {
+            background: #3a7a1f;
+            color: white;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #4a8f29;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4a8f29;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="purchase-container">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #4a8f29; margin: 0;">📦 Purchase Management</h1>
+            <p style="color: #666; margin: 5px 0;">Manage suppliers, purchase orders, and inventory</p>
+        </div>
+
+        <!-- Navigation -->
+        <div style="margin-bottom: 30px; text-align: center;">
+            <a href="{{ url_for('admin.index') }}supplier/" class="btn btn-custom">🏭 Manage Suppliers</a>
+            <a href="{{ url_for('admin.index') }}purchase/" class="btn btn-custom">📦 Purchase Orders</a>
+            <a href="{{ url_for('admin.index') }}purchaseitem/" class="btn btn-custom">📋 Purchase Items</a>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">← Back to Dashboard</a>
+        </div>
+
+        <!-- Statistics -->
+        <div class="section-card">
+            <h3>📊 Purchase Statistics</h3>
+            <div class="stats-grid" id="purchaseStats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalSuppliers">Loading...</div>
+                    <div class="stat-label">Total Suppliers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalPurchases">Loading...</div>
+                    <div class="stat-label">Total Purchase Orders</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="monthlyPurchases">Loading...</div>
+                    <div class="stat-label">This Month's Purchases</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalPurchaseCost">Loading...</div>
+                    <div class="stat-label">Total Purchase Cost</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section-card">
+            <h3>⚡ Quick Actions</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">🏭 Add New Supplier</h5>
+                            <p class="card-text">Create a new supplier record with contact information.</p>
+                            <a href="{{ url_for('admin.index') }}supplier/new" class="btn btn-custom">Add Supplier</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">📦 Create Purchase Order</h5>
+                            <p class="card-text">Generate a new purchase order from a supplier.</p>
+                            <a href="{{ url_for('admin.index') }}purchase/new" class="btn btn-custom">Create PO</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Purchases -->
+        <div class="section-card">
+            <h3>📋 Recent Purchase Orders</h3>
+            <div id="recentPurchases">
+                <p style="text-align: center; color: #666;">Loading recent purchases...</p>
+            </div>
+        </div>
+
+        <!-- Purchase Workflow -->
+        <div class="section-card">
+            <h3>🔄 Purchase Workflow</h3>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div style="width: 60px; height: 60px; background: #4a8f29; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; color: white; font-size: 24px;">1</div>
+                        <h6>Add Supplier</h6>
+                        <small class="text-muted">Create supplier records</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div style="width: 60px; height: 60px; background: #4a8f29; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; color: white; font-size: 24px;">2</div>
+                        <h6>Create PO</h6>
+                        <small class="text-muted">Generate purchase orders</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div style="width: 60px; height: 60px; background: #4a8f29; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; color: white; font-size: 24px;">3</div>
+                        <h6>Receive Stock</h6>
+                        <small class="text-muted">Update inventory</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div style="width: 60px; height: 60px; background: #4a8f29; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; color: white; font-size: 24px;">4</div>
+                        <h6>Track Payments</h6>
+                        <small class="text-muted">Monitor payment status</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load purchase statistics
+        async function loadPurchaseStats() {
+            try {
+                const response = await fetch('/api/dashboard/stats');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const stats = data.data.purchases;
+                    document.getElementById('totalSuppliers').textContent = stats.total_suppliers;
+                    document.getElementById('totalPurchases').textContent = stats.total_purchases;
+                    document.getElementById('monthlyPurchases').textContent = stats.monthly_purchases;
+                    document.getElementById('totalPurchaseCost').textContent = `KSh ${stats.total_purchase_cost.toLocaleString()}`;
+                }
+            } catch (error) {
+                console.error('Error loading purchase stats:', error);
+            }
+        }
+
+        // Load recent purchases
+        async function loadRecentPurchases() {
+            try {
+                const response = await fetch('/api/purchases');
+                const data = await response.json();
+                
+                if (data.length > 0) {
+                    const recentPurchasesHtml = data.slice(0, 5).map(purchase => `
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title mb-1">${purchase.purchase_number}</h6>
+                                        <small class="text-muted">${purchase.supplier_name} • ${purchase.purchase_date}</small>
+                                    </div>
+                                    <div class="text-right">
+                                        <strong>KSh ${purchase.total_cost.toLocaleString()}</strong><br>
+                                        <span class="badge badge-${purchase.payment_status === 'Paid' ? 'success' : 'warning'}">${purchase.payment_status}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    document.getElementById('recentPurchases').innerHTML = recentPurchasesHtml;
+                } else {
+                    document.getElementById('recentPurchases').innerHTML = '<p style="text-align: center; color: #666;">No purchase orders found.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading recent purchases:', error);
+                document.getElementById('recentPurchases').innerHTML = '<p style="text-align: center; color: #dc3545;">Error loading purchases.</p>';
+            }
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPurchaseStats();
+            loadRecentPurchases();
+        });
+    </script>
+</body>
+</html> 
